@@ -1,0 +1,7 @@
+# 작업 PC는 Windows(core.autocrlf=true)라 체크아웃 시 CRLF로 바뀐다.
+# 저장소에는 항상 LF로 저장해 diff가 줄바꿈 때문에 흔들리지 않게 한다.
+* text=auto eol=lf
+
+*.png binary
+*.jpg binary
+*.ico binary
