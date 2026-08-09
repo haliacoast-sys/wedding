@@ -1,0 +1,688 @@
+<!DOCTYPE html>
+<html lang="ko" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>계사(癸巳) 일주 사주 종합 분석</title>
+<style>
+:root{
+  color-scheme:light;
+  --plane:#f9f9f7; --surface:#fcfcfb; --surface-2:#f2f1ed;
+  --ink:#0b0b0b; --ink-2:#52514e; --muted:#898781;
+  --grid:#e1e0d9; --axis:#c3c2b7; --hair:rgba(11,11,11,.10);
+  --s1:#2a78d6; --s2:#eb6834;
+  --s1-wash:rgba(42,120,214,.10); --s2-wash:rgba(235,104,52,.10);
+  --good:#0ca30c; --warn:#fab219; --serious:#ec835a; --crit:#d03b3b;
+  --mok:#1f7a5c; --hwa:#c62f2f; --to:#9c6a10; --geum:#6b6a66; --su:#1f4e9c;
+  --radius:14px;
+}
+@media (prefers-color-scheme:dark){
+  :root:where(:not([data-theme="light"])){
+    color-scheme:dark;
+    --plane:#0d0d0d; --surface:#1a1a19; --surface-2:#232322;
+    --ink:#fff; --ink-2:#c3c2b7; --muted:#898781;
+    --grid:#2c2c2a; --axis:#383835; --hair:rgba(255,255,255,.10);
+    --s1:#3987e5; --s2:#d95926;
+    --s1-wash:rgba(57,135,229,.14); --s2-wash:rgba(217,89,38,.14);
+    --mok:#4bc49a; --hwa:#f07a7a; --to:#d9a03c; --geum:#b5b3ab; --su:#6fa8f0;
+  }
+}
+:root[data-theme="dark"]{
+  color-scheme:dark;
+  --plane:#0d0d0d; --surface:#1a1a19; --surface-2:#232322;
+  --ink:#fff; --ink-2:#c3c2b7; --muted:#898781;
+  --grid:#2c2c2a; --axis:#383835; --hair:rgba(255,255,255,.10);
+  --s1:#3987e5; --s2:#d95926;
+  --s1-wash:rgba(57,135,229,.14); --s2-wash:rgba(217,89,38,.14);
+  --mok:#4bc49a; --hwa:#f07a7a; --to:#d9a03c; --geum:#b5b3ab; --su:#6fa8f0;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;padding:0}
+body{
+  background:var(--plane); color:var(--ink);
+  font-family:system-ui,-apple-system,"Segoe UI","Apple SD Gothic Neo","Noto Sans KR",sans-serif;
+  font-size:15px; line-height:1.68; letter-spacing:-.01em;
+  padding-bottom:64px;
+}
+.wrap{max-width:720px;margin:0 auto;padding:0 14px}
+h1,h2,h3,h4{line-height:1.35;letter-spacing:-.02em;margin:0}
+a{color:var(--s1)}
+
+/* ── header ── */
+header.hero{
+  padding:30px 0 22px;text-align:center;
+  border-bottom:1px solid var(--hair);margin-bottom:14px;
+}
+.hero .eyebrow{font-size:11px;letter-spacing:.16em;color:var(--muted);text-transform:uppercase;font-weight:600}
+.hero h1{font-size:25px;font-weight:700;margin:9px 0 6px}
+.hero .sub{font-size:13px;color:var(--ink-2)}
+.themeBtn{
+  position:absolute;top:14px;right:14px;background:var(--surface);border:1px solid var(--hair);
+  color:var(--ink-2);border-radius:999px;padding:7px 12px;font-size:12px;cursor:pointer;font-family:inherit
+}
+
+/* ── tabs ── */
+nav.tabs{
+  position:sticky;top:0;z-index:30;background:var(--plane);
+  border-bottom:1px solid var(--hair);margin:0 -14px 18px;padding:8px 0 7px;
+}
+.tabs-inner{display:flex;gap:6px;overflow-x:auto;padding:0 14px;scrollbar-width:none}
+.tabs-inner::-webkit-scrollbar{display:none}
+.tab{
+  flex:0 0 auto;border:1px solid var(--hair);background:var(--surface);color:var(--ink-2);
+  border-radius:999px;padding:8px 14px;font-size:13px;font-weight:600;cursor:pointer;
+  white-space:nowrap;font-family:inherit;transition:.15s
+}
+.tab[aria-selected="true"]{background:var(--ink);color:var(--surface);border-color:var(--ink)}
+
+/* ── panels ── */
+.panel{display:none;animation:fade .22s ease}
+.panel.on{display:block}
+@keyframes fade{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:none}}
+
+section{margin:0 0 20px}
+h2.sec{font-size:19px;font-weight:700;margin:26px 0 4px;display:flex;align-items:center;gap:9px}
+h2.sec:first-child{margin-top:4px}
+h2.sec .n{
+  flex:0 0 auto;width:25px;height:25px;border-radius:8px;background:var(--ink);color:var(--surface);
+  font-size:12px;display:grid;place-items:center;font-weight:700
+}
+p.lede{color:var(--ink-2);font-size:13.5px;margin:4px 0 14px}
+
+.card{
+  background:var(--surface);border:1px solid var(--hair);border-radius:var(--radius);
+  padding:16px;margin:0 0 13px
+}
+.card h3{font-size:15.5px;font-weight:700;margin-bottom:9px;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.card h4{font-size:13.5px;font-weight:700;margin:15px 0 6px;color:var(--ink)}
+.card p{margin:0 0 9px;font-size:14px}
+.card p:last-child{margin-bottom:0}
+.card ul{margin:0 0 9px;padding-left:17px}
+.card li{margin:0 0 6px;font-size:14px}
+.card li::marker{color:var(--muted)}
+
+.pill{
+  display:inline-block;font-size:11px;font-weight:700;padding:3px 9px;border-radius:999px;
+  background:var(--surface-2);color:var(--ink-2);border:1px solid var(--hair);letter-spacing:0
+}
+.pill.p1{background:var(--s1-wash);color:var(--s1);border-color:transparent}
+.pill.p2{background:var(--s2-wash);color:var(--s2);border-color:transparent}
+
+.kv{display:grid;grid-template-columns:74px 1fr;gap:7px 11px;font-size:13.5px;margin:9px 0}
+.kv dt{color:var(--muted);font-weight:600}
+.kv dd{margin:0;color:var(--ink)}
+
+/* ── 사주 원국표 ── */
+.saju{width:100%;border-collapse:separate;border-spacing:0;font-size:12px;margin:4px 0 2px}
+.saju th,.saju td{padding:6px 3px;text-align:center;border-bottom:1px solid var(--grid)}
+.saju thead th{font-size:11px;color:var(--muted);font-weight:600;border-bottom:1px solid var(--axis)}
+.saju th.rl{text-align:left;color:var(--muted);font-weight:600;font-size:11px;width:46px;padding-left:2px}
+.gz{font-size:23px;font-weight:700;line-height:1.18;letter-spacing:-.03em}
+.gz small{display:block;font-size:10px;font-weight:700;letter-spacing:.02em;margin-top:1px}
+.e-mok{color:var(--mok)} .e-hwa{color:var(--hwa)} .e-to{color:var(--to)}
+.e-geum{color:var(--geum)} .e-su{color:var(--su)}
+.saju td.day{background:var(--surface-2)}
+.saju .ss{font-size:11.5px;color:var(--ink-2)}
+.legend-oh{display:flex;flex-wrap:wrap;gap:5px;margin:9px 0 0}
+.ohchip{font-size:10.5px;font-weight:700;padding:2px 8px;border-radius:999px;border:1px solid var(--hair);background:var(--surface-2)}
+
+/* ── 차트 ── */
+.chart{margin:6px 0 2px}
+.legend{display:flex;gap:14px;margin:0 0 12px;font-size:12px;color:var(--ink-2);flex-wrap:wrap}
+.legend i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:6px;vertical-align:-1px}
+.rowlbl{display:flex;justify-content:space-between;align-items:baseline;font-size:12px;margin:11px 0 4px}
+.rowlbl b{font-weight:700;font-size:12.5px}
+.rowlbl span{color:var(--muted);font-variant-numeric:tabular-nums}
+.bars{display:flex;flex-direction:column;gap:2px}
+.bar{height:11px;border-radius:0 4px 4px 0;min-width:2px;transition:width .5s cubic-bezier(.2,.7,.3,1)}
+.bar.z{background:repeating-linear-gradient(45deg,var(--grid),var(--grid) 3px,transparent 3px,transparent 6px);
+  border-radius:0 2px 2px 0;width:14px!important;height:11px}
+
+/* meter */
+.meter{margin:0 0 13px}
+.meter .mt{display:flex;justify-content:space-between;font-size:13px;margin-bottom:5px}
+.meter .mt b{font-weight:600}
+.meter .mt span{font-variant-numeric:tabular-nums;color:var(--ink-2);font-weight:700}
+.track{height:9px;border-radius:999px;background:var(--s1-wash);overflow:hidden}
+.fill{height:100%;border-radius:999px;background:var(--s1)}
+
+/* 대운 타임라인 */
+.tl{display:flex;gap:2px;margin:10px 0 6px;overflow-x:auto;padding-bottom:5px;scrollbar-width:thin}
+.tl .u{
+  flex:0 0 auto;min-width:74px;background:var(--surface-2);border-radius:9px;padding:9px 7px;text-align:center;
+  border:1px solid transparent
+}
+.tl .u.now{background:var(--s1-wash);border-color:var(--s1)}
+.tl .u .a{font-size:10px;color:var(--muted);font-weight:700}
+.tl .u .g{font-size:16px;font-weight:700;margin:2px 0 1px}
+.tl .u .s{font-size:9.5px;color:var(--ink-2);line-height:1.35}
+.tl .u.now .a{color:var(--s1)}
+
+/* 택일 카드 */
+.datecard{
+  background:var(--surface);border:1px solid var(--hair);border-radius:var(--radius);
+  padding:14px 15px;margin:0 0 11px;position:relative;overflow:hidden
+}
+.datecard::before{content:"";position:absolute;left:0;top:0;bottom:0;width:4px;background:var(--axis)}
+.datecard.s::before{background:var(--good)} .datecard.a::before{background:var(--s1)}
+.datecard.b::before{background:var(--warn)}
+.dc-top{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;margin-bottom:7px}
+.dc-d{font-size:19px;font-weight:700;letter-spacing:-.02em}
+.dc-d em{font-style:normal;font-size:13px;color:var(--ink-2);font-weight:600;margin-left:4px}
+.dc-g{font-size:12px;color:var(--muted);margin-top:2px}
+.grade{
+  flex:0 0 auto;font-size:10.5px;font-weight:800;padding:4px 9px;border-radius:7px;letter-spacing:.04em;
+  background:var(--surface-2);color:var(--ink-2)
+}
+.grade.s{background:rgba(12,163,12,.13);color:var(--good)}
+.grade.a{background:var(--s1-wash);color:var(--s1)}
+.dc-r{font-size:13px;color:var(--ink-2);margin:0 0 7px}
+.tags{display:flex;flex-wrap:wrap;gap:4px}
+.tag{font-size:10.5px;padding:2px 7px;border-radius:6px;background:var(--surface-2);color:var(--ink-2);font-weight:600}
+.tag.g{background:rgba(12,163,12,.12);color:var(--good)}
+.tag.w{background:rgba(250,178,25,.16);color:#8a6100}
+@media (prefers-color-scheme:dark){:root:where(:not([data-theme="light"])) .tag.w{color:var(--warn)}}
+:root[data-theme="dark"] .tag.w{color:var(--warn)}
+
+/* 표 */
+.tbl{width:100%;border-collapse:collapse;font-size:12.5px;margin:8px 0}
+.tbl th,.tbl td{padding:8px 6px;text-align:left;border-bottom:1px solid var(--grid);vertical-align:top;word-break:keep-all;overflow-wrap:anywhere}
+.tbl th{color:var(--muted);font-size:11px;font-weight:600;white-space:nowrap}
+.tbl td.n{font-variant-numeric:tabular-nums;white-space:nowrap;font-weight:600}
+
+/* 콜아웃 */
+.note{
+  border-left:3px solid var(--s1);background:var(--s1-wash);padding:11px 13px;border-radius:0 10px 10px 0;
+  font-size:13.5px;margin:11px 0
+}
+.note.warn{border-color:var(--warn);background:rgba(250,178,25,.10)}
+.note.good{border-color:var(--good);background:rgba(12,163,12,.09)}
+.note b{font-weight:700}
+
+details{background:var(--surface);border:1px solid var(--hair);border-radius:12px;margin:0 0 10px;overflow:hidden}
+details summary{
+  padding:13px 15px;font-size:14px;font-weight:600;cursor:pointer;list-style:none;
+  display:flex;justify-content:space-between;align-items:center;gap:8px
+}
+details summary::-webkit-details-marker{display:none}
+details summary::after{content:"＋";color:var(--muted);font-weight:400;font-size:15px}
+details[open] summary::after{content:"−"}
+details .body{padding:0 15px 14px;font-size:13.5px;color:var(--ink-2);border-top:1px solid var(--grid);padding-top:12px}
+details .body p{margin:0 0 9px} details .body p:last-child{margin:0}
+details .body ul{margin:0 0 9px;padding-left:17px}
+
+footer{margin:32px 0 10px;padding-top:18px;border-top:1px solid var(--hair);font-size:11.5px;color:var(--muted);line-height:1.7}
+.hero-fig{font-size:50px;font-weight:700;line-height:1;letter-spacing:-.03em}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:11px}
+@media(max-width:400px){.two{grid-template-columns:1fr}}
+.mini{font-size:11.5px;color:var(--muted);margin-top:6px}
+</style>
+</head>
+<body>
+<button class="themeBtn" id="tbtn">◐ 테마</button>
+<div class="wrap">
+<header class="hero">
+  <div class="eyebrow">WEDDING · 계약 정리</div>
+  <h1>결혼 준비 정리</h1>
+  <div class="sub">① CA웨딩컨벤션 홀 계약 · 2026.08.09 체결 · v2</div>
+</header>
+<nav class="tabs">
+  <div class="tabs-inner" role="tablist">
+    <button class="tab" role="tab" aria-selected="true" data-t="w0">요약</button>
+    <button class="tab" role="tab" aria-selected="false" data-t="w1">계약 내용</button>
+    <button class="tab" role="tab" aria-selected="false" data-t="w2">비용</button>
+    <button class="tab" role="tab" aria-selected="false" data-t="w6">시간 변경</button>
+    <button class="tab" role="tab" aria-selected="false" data-t="w3">확인할 것</button>
+    <button class="tab" role="tab" aria-selected="false" data-t="w4">일정</button>
+    <button class="tab" role="tab" aria-selected="false" data-t="w5">다음</button>
+  </div>
+</nav>
+
+<div class="panel on" id="w0">
+<h2 class="sec"><span class="n">◆</span>계약 요약</h2>
+<div class="card" style="text-align:center">
+  <div style="font-size:13px;color:var(--muted);font-weight:700;letter-spacing:.05em">홀 계약 총액</div>
+  <div class="hero-fig" style="margin:6px 0">1,725<span style="font-size:22px">만원</span></div>
+  <p class="mini">계약금 100만원 납부 완료 · 앞으로 낼 돈 <b>1,625만원</b></p>
+</div>
+<div class="card">
+  <dl class="kv">
+    <dt>예식일</dt><dd><b>2027년 9월 4일(토)</b> · D-391</dd>
+    <dt>예식시간</dt><dd><b>12:30</b> <span class="pill" style="background:rgba(250,178,25,.16);color:#8a6100;border:none">변경 예정</span><br><span class="mini">계약서 원본은 11:00 — 홀 서면 동의 필요</span></dd>
+    <dt>장소</dt><dd>CA웨딩컨벤션 2F <b>루체홀</b> (70분 간격)</dd>
+    <dt>보증인원</dt><dd><b>200명</b> (7세 미만 무료 · 하향 불가)</dd>
+    <dt>계약일</dt><dd>2026년 8월 9일 (박람회 현장)</dd>
+    <dt>계약금</dt><dd>1,000,000원 납부</dd>
+    <dt>담당자</dt><dd>이도경 · 010-9019-9920</dd>
+    <dt>주소</dt><dd>충남 아산시 배방읍 희망로 100</dd>
+  </dl>
+</div>
+
+<h2 class="sec"><span class="n">◇</span>금액 구조</h2>
+<div class="card">
+  <table class="tbl"><tbody>
+    <tr><td>홀 대관</td><td class="n">4,700,000</td></tr>
+    <tr><td>컨시어지 (필수)</td><td class="n">350,000</td></tr>
+    <tr><td>식대 200명 × 61,000</td><td class="n">12,200,000</td></tr>
+    <tr><td>주류 · 음료</td><td class="n" style="color:var(--good)">서비스</td></tr>
+    <tr style="border-top:2px solid var(--axis)"><td><b>총액</b></td><td class="n"><b>17,250,000</b></td></tr>
+    <tr><td>계약금 (기납부)</td><td class="n">−1,000,000</td></tr>
+    <tr style="border-top:1px solid var(--axis)"><td><b>잔금</b></td><td class="n"><b>16,250,000</b></td></tr>
+  </tbody></table>
+  <div class="note good"><b>총액이 견적서의 '박람회 혜택가 17,250,000원'과 정확히 일치합니다.</b> 웨딩 패키지를 빼면서 금액이 깔끔해졌고, 이전에 불확실했던 140만원 논란도 사라졌습니다.</div>
+</div>
+
+<h2 class="sec"><span class="n">◇</span>세 줄 평</h2>
+<div class="card">
+  <h3>1. 가격은 잘 받으셨습니다</h3>
+  <p>같은 조건(200명·패키지 제외)을 정가로 계산하면 <b>2,319만원</b>인데 <b>1,725만원</b>에 계약하셨습니다. <b>594만원, 25.6% 절감</b>입니다. 주류·음료 140만원어치와 옵션 3종(포토테이블·플라워샤워·사회자 또는 본식영상)을 전부 서비스로 받은 게 큽니다.</p>
+</div>
+<div class="card">
+  <h3>2. 날짜는 사주 택일 1위입니다</h3>
+  <p>2027년 9월 4일(토)은 <b>2027 하반기~2028년 주말 택일 1위(84점)</b>와 정확히 일치합니다. 2위와 10점 차이로, 추석(9/15)과도 11일 떨어져 있어 연휴와 무관합니다.</p>
+</div>
+<div class="card">
+  <h3>3. 시간만 한 단계 내려갑니다</h3>
+  <p>11:00은 巳시로 <b>명당(황도)</b>이었는데, 12:30은 午시라 <b>천형(흑도)</b>입니다. 다만 午시는 <b>신부 천을귀인 시간</b>이기도 해서 완전히 나쁜 건 아닙니다. 택일에서 시간은 날짜의 보조 요소이고 날짜가 최상급이라 크게 개의치 않으셔도 됩니다. 자세한 건 '시간 변경' 탭에 정리했습니다.</p>
+</div>
+</div>
+
+<div class="panel" id="w6">
+<h2 class="sec"><span class="n">1</span>11:00 vs 12:30</h2>
+<div class="card">
+  <p>2027년 9월 4일은 <b>丙戌일</b>입니다. 예식 시간에 따라 시주(時柱)가 이렇게 바뀝니다.</p>
+  <table class="tbl">
+    <thead><tr><th></th><th>11:00 (계약 원본)</th><th>12:30 (변경 예정)</th></tr></thead>
+    <tbody>
+    <tr><td>시지</td><td><b>巳시</b><br><span class="mini">표준시 09:30~11:30</span></td><td><b>午시</b><br><span class="mini">표준시 11:30~13:30</span></td></tr>
+    <tr><td>시주</td><td class="n"><b>癸巳</b></td><td class="n"><b>甲午</b></td></tr>
+    <tr><td>황도</td><td style="color:var(--good)"><b>명당 ○</b></td><td style="color:var(--crit)"><b>천형 ×</b></td></tr>
+    <tr><td>신부에게</td><td>식신 / <b>정관(남편성)</b><br>癸水 = <b>용신</b><br>일지 酉와 <b>巳酉 반합</b></td><td>정재 / <b>편관(남편성)</b><br><b>★천을귀인 시간</b><br>년지 寅과 <b>寅午 화국</b></td></tr>
+    <tr><td>신랑에게</td><td>편인 / 상관<br>癸水 = <b>용신</b><br>월지·일지 巳 복음</td><td>겁재 / 식신<br>시지 午 복음<br><span class="mini">문창·학당·태극귀인 자리 활성</span></td></tr>
+    <tr><td>감점 요소</td><td>寅巳형(신부 년지)<br>신랑 일지 복음</td><td><b>卯午파 2회</b>(신부 월·시지)<br>흑도 천형</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<h2 class="sec"><span class="n">2</span>어느 쪽이 나은가</h2>
+<div class="card">
+  <h3>사주로만 보면 11:00이 낫습니다</h3>
+  <ul>
+    <li><b>癸水가 두 분 공통 용신</b>입니다. 11시 시주 천간이 바로 그 癸水라, 시간까지 용신으로 채워지는 배치였습니다.</li>
+    <li>巳가 <b>신부 일지 酉와 巳酉 반합</b>을 이룹니다. 부부궁이 시간에도 한 번 더 묶입니다.</li>
+    <li>황도 <b>명당</b>일이라 12시 반(천형)보다 한 등급 위입니다.</li>
+  </ul>
+  <h3>그래도 12:30이 나쁘지 않은 이유</h3>
+  <ul>
+    <li><b>午는 신부의 천을귀인</b>입니다(辛 일간 → 寅·午). 신살 중 최고 길신이 드는 시간대라, 흑도라는 감점을 상당 부분 상쇄합니다.</li>
+    <li>신부 년지 寅과 <b>寅午 반합 화국</b>을 이뤄, 원국에 없던 <b>관성(남편성)이 생깁니다.</b> 결혼식이라는 행사의 성격과는 오히려 잘 맞습니다.</li>
+    <li>신랑 시지 午와 복음이라 <b>문창·학당·태극귀인이 몰린 자리</b>가 활성화됩니다.</li>
+    <li><b>택일에서 시간은 날짜의 보조 요소</b>입니다. 일진이 84점 최상급이면 시간대 한 등급 차이는 결정적이지 않습니다.</li>
+  </ul>
+  <div class="note"><b>결론</b> — 12:30으로 바꾸셔도 됩니다. 다만 <b>혹시 11:20 이전 슬롯이 가능하다면</b> 그쪽이 사주로는 한 단계 위입니다. 11:29까지가 巳시입니다.</div>
+</div>
+
+<h2 class="sec"><span class="n">3</span>실무적으로 확인할 것</h2>
+<div class="card">
+  <h4>① 70분 간격이라 12:30이 있는지</h4>
+  <p>계약서에 <b>"11:00 (70분 간격)"</b>이라고 되어 있습니다. 70분 간격이면 다음 슬롯은 <b>12:10</b>이지 12:30이 아닙니다. 12:30 슬롯이 실제로 존재하는지 먼저 확인하세요.</p>
+  <p class="mini">참고로 <b>12:10도 午시</b>라 사주상 12:30과 동일합니다.</p>
+  <h4>② 계약 변경은 서면 동의가 필요합니다</h4>
+  <p>약관 <b>제4조 2항</b> — "계약자가 계약 내용을 변경하고자 할 경우, 사전에 사업자의 서면 동의를 받아야 하며 <b>변경 시 추가 비용이 발생할 수 있습니다.</b>"</p>
+  <p>시간 변경으로 <b>대관료나 혜택 조건이 달라지지 않는지</b> 반드시 확인하고, 변경된 계약서를 다시 받으세요.</p>
+  <h4>③ 식사 시간대가 달라집니다</h4>
+  <table class="tbl">
+    <thead><tr><th></th><th>11:00</th><th>12:30</th></tr></thead>
+    <tbody>
+    <tr><td>연회 이용</td><td class="n">10:30~13:00</td><td class="n">12:00~14:30</td></tr>
+    <tr><td>식사 시작</td><td class="n">약 12:10</td><td class="n">약 13:40</td></tr>
+    <tr><td>신부 준비 시작</td><td class="n">새벽 5~6시</td><td class="n">아침 7~8시</td></tr>
+    </tbody>
+  </table>
+  <p>12:30은 <b>신부 준비가 훨씬 여유로운</b> 대신 <b>식사가 점심 피크를 넘깁니다.</b> 멀리서 오시는 하객이 많다면 배고픔을 감안하셔야 하고, 반대로 오전 이동 부담은 줄어듭니다.</p>
+</div>
+</div>
+
+<div class="panel" id="w1">
+<h2 class="sec"><span class="n">1</span>계약에 포함된 것</h2>
+<div class="card">
+  <h3>홀 대관 <span class="pill p1">4,700,000원</span></h3>
+  <ul>
+    <li>예식홀 · 플라워 장식 · 특수음향 및 조명</li>
+    <li>신부대기실 · 브라이덜샤워</li>
+    <li>혼구용품 (방명록 · 성혼선언문 · 청첩 · 봉투 등)</li>
+    <li>식권</li>
+    <li><b>원판 촬영 앨범 3권</b> (11×14 Size, 10P) — <b>필수 · 외부 촬영 불가</b></li>
+    <li>홀 사용시간: 토요일 <b>70분</b> / 연회 이용은 예식 30분 전부터 총 2시간 30분</li>
+  </ul>
+</div>
+<div class="card">
+  <h3>선택 사항 <span class="pill p1">350,000원</span></h3>
+  <table class="tbl">
+    <thead><tr><th>항목</th><th>정가</th><th>계약</th></tr></thead>
+    <tbody>
+    <tr><td>컨시어지 (필수)</td><td class="n">350,000</td><td class="n">350,000</td></tr>
+    <tr><td>포토테이블</td><td class="n">300,000</td><td class="n" style="color:var(--good)"><b>서비스</b></td></tr>
+    <tr><td>플라워샤워</td><td class="n">200,000</td><td class="n" style="color:var(--good)"><b>서비스</b></td></tr>
+    <tr><td>전문 사회자 <b>또는</b> 본식 영상<br><span class="mini">(둘 중 1종 선택)</span></td><td class="n">350,000<br>440,000</td><td class="n" style="color:var(--good)"><b>서비스</b></td></tr>
+    </tbody>
+  </table>
+  <div class="note"><b>아직 안 정하신 것</b> — 전문 사회자와 본식 영상 중 <b>하나만</b> 서비스입니다. 금액만 보면 본식 영상(정가 44만원)이 사회자(35만원)보다 유리하고, 사회자는 지인에게 부탁하는 방법도 있습니다.</div>
+</div>
+<div class="card">
+  <h3>식·음료 <span class="pill p1">12,200,000원</span></h3>
+  <table class="tbl">
+    <thead><tr><th>항목</th><th>정가 단가</th><th>계약 단가</th><th>200명 기준</th></tr></thead>
+    <tbody>
+    <tr><td>Premium Buffet<br><span class="mini">스테이크 &amp; 뷔페 · 미취학 아동 무료</span></td><td class="n">69,000</td><td class="n"><b>61,000</b></td><td class="n">12,200,000</td></tr>
+    <tr><td>생맥주 · 소주</td><td class="n">5,000</td><td class="n" style="color:var(--good)"><b>서비스</b></td><td class="n">0</td></tr>
+    <tr><td>Free Drink (디스펜서)</td><td class="n">2,000</td><td class="n" style="color:var(--good)"><b>서비스</b></td><td class="n">0</td></tr>
+    </tbody>
+  </table>
+  <p class="mini">박람회 혜택으로 <b>식대 −2,000원/인</b>이 추가 적용되어 63,000원 → 61,000원이 되었습니다.</p>
+</div>
+
+<h2 class="sec"><span class="n">2</span>이 홀에서 하지 않기로 한 것</h2>
+<div class="card">
+  <h3>웨딩 패키지 <span class="pill">제외</span></h3>
+  <table class="tbl">
+    <thead><tr><th>항목</th><th>정가</th><th>제안가</th></tr></thead>
+    <tbody>
+    <tr><td>본식 — 드레스·턱시도, 본식 헤어·메이크업</td><td class="n">2,000,000</td><td rowspan="2" class="n" style="vertical-align:middle">1,400,000<br><span class="mini">(특별할인)</span></td></tr>
+    <tr><td>스튜디오 — 헤어·메이크업, 리허설 촬영</td><td class="n">1,200,000</td></tr>
+    </tbody>
+  </table>
+  <p><b>외부 스드메로 진행하기로 하셨습니다.</b> 이에 따라 함께 빠지는 항목이 있습니다.</p>
+  <ul>
+    <li><b>헬퍼비 180,000원</b> — 패키지 부속 항목이라 홀 결제에서 빠집니다. 다만 <b>사라지는 게 아니라 외부 스드메 예산으로 이동</b>합니다. 어느 업체를 쓰든 본식 당일 헬퍼비는 발생합니다(통상 15~25만원).</li>
+    <li>스튜디오 <b>원본 구매</b> 비용도 홀 계약에서 빠집니다.</li>
+  </ul>
+  <div class="note warn"><b>확인 필요</b> — 견적서 소계에서 패키지가 이미 0으로 계산돼 있었으므로 <b>박람회 혜택가에는 영향이 없어야 정상</b>입니다. 다만 홀 입장에서 "패키지 포함을 전제로 준 할인"이라고 주장할 여지가 있으니, <b>패키지 제외 의사를 전달하면서 대관료·식대 조건이 그대로인지</b> 반드시 함께 확인하세요.</div>
+</div>
+
+<h2 class="sec"><span class="n">3</span>홀 계약에 없는 별도 비용</h2>
+<div class="card">
+  <table class="tbl">
+    <thead><tr><th>항목</th><th>금액</th><th>비고</th></tr></thead>
+    <tbody>
+    <tr><td><b>스드메 일체</b></td><td class="n">외부</td><td>드레스·턱시도·헤어메이크업·스튜디오 — 별도 계약</td></tr>
+    <tr><td>헬퍼비</td><td class="n">15~25만</td><td>스드메 예산에 포함해서 계산</td></tr>
+    <tr><td>혼주 미용</td><td class="n">女 180,000<br>男 55,000</td><td>홀 협력업체 직접 결제 · 조기 마감 가능</td></tr>
+    <tr><td>본식 스냅</td><td class="n">700,000</td><td>미계약 · <b>5개월 전 예약</b> 필요</td></tr>
+    <tr><td>부케</td><td class="n">200,000</td><td>미계약 (부토니아·혼주 코사지 포함)</td></tr>
+    <tr><td>축가 / 주례</td><td class="n">각 300,000</td><td>미계약</td></tr>
+    <tr><td>청첩장 / 모바일</td><td class="n">100,000 / 50,000</td><td>모바일은 청첩장 계약 시 서비스</td></tr>
+    <tr><td>현악 4중주</td><td class="n">600,000</td><td>미계약</td></tr>
+    <tr><td>턱시도 구두</td><td class="n">별도</td><td>스드메 업체 확인 사항</td></tr>
+    </tbody>
+  </table>
+  <div class="note warn"><b>외부 스드메를 쓰신다면 약관 제6조를 꼭 보세요.</b> "사진·영상·장식 등 외부 전문업체 사용 시 <b>반드시 사전 승인</b>을 받아야 하며, 승인 없이 이용한 경우 발생한 모든 문제에 대해 사업자는 책임지지 않습니다."<br><br>본식 당일 홀에 들어오는 <b>헤어·메이크업 팀, 스냅 작가</b>가 여기 해당할 수 있습니다. 업체를 정하는 대로 홀에 미리 알리고 승인을 문자로 받아두세요.</div>
+</div>
+</div>
+
+<div class="panel" id="w2">
+<h2 class="sec"><span class="n">1</span>정가 대비 절감</h2>
+<div class="card">
+  <table class="tbl">
+    <thead><tr><th>항목</th><th>정가</th><th>계약가</th><th>절감</th></tr></thead>
+    <tbody>
+    <tr><td>홀 대관</td><td class="n">6,700,000</td><td class="n">4,700,000</td><td class="n" style="color:var(--good)">−2,000,000</td></tr>
+    <tr><td>선택 사항</td><td class="n">1,290,000</td><td class="n">350,000</td><td class="n" style="color:var(--good)">−940,000</td></tr>
+    <tr><td>식대 (200명)</td><td class="n">13,800,000</td><td class="n">12,200,000</td><td class="n" style="color:var(--good)">−1,600,000</td></tr>
+    <tr><td>주류 (200명)</td><td class="n">1,000,000</td><td class="n">0</td><td class="n" style="color:var(--good)">−1,000,000</td></tr>
+    <tr><td>음료 (200명)</td><td class="n">400,000</td><td class="n">0</td><td class="n" style="color:var(--good)">−400,000</td></tr>
+    <tr style="border-top:2px solid var(--axis)"><td><b>합계</b></td><td class="n"><b>23,190,000</b></td><td class="n"><b>17,250,000</b></td><td class="n" style="color:var(--good)"><b>−5,940,000</b></td></tr>
+    </tbody>
+  </table>
+  <p class="mini">정가는 200명 기준으로 환산했고, 웨딩 패키지는 양쪽에서 제외했습니다. 절감률 <b>25.6%</b>.</p>
+  <h4>박람회 혜택 3종</h4>
+  <ul>
+    <li><b>대관료 −100만원</b> — 5,700,000 → 4,700,000</li>
+    <li><b>보증인원 50명 하향</b> — 250명 → 200명 (약 300만원 절감 효과)</li>
+    <li><b>식대 −2,000원/인</b> — 63,000 → 61,000</li>
+  </ul>
+</div>
+
+<h2 class="sec"><span class="n">2</span>토요일 vs 일요일이었다면</h2>
+<div class="card">
+  <table class="tbl">
+    <thead><tr><th></th><th>토요일 (계약)</th><th>일요일</th></tr></thead>
+    <tbody>
+    <tr><td>홀 대관</td><td class="n">4,700,000</td><td class="n">2,900,000</td></tr>
+    <tr><td>보증인원</td><td class="n">200명</td><td class="n">150명</td></tr>
+    <tr><td>식대 단가</td><td class="n">61,000</td><td class="n">55,000</td></tr>
+    <tr><td>식대 소계</td><td class="n">12,200,000</td><td class="n">8,250,000</td></tr>
+    <tr><td>컨시어지</td><td class="n">350,000</td><td class="n">350,000</td></tr>
+    <tr style="border-top:2px solid var(--axis)"><td><b>합계</b></td><td class="n"><b>17,250,000</b></td><td class="n"><b>11,500,000</b></td></tr>
+    </tbody>
+  </table>
+  <div class="note"><b>참고</b> — 일요일이 575만원 저렴하지만 보증인원이 150명으로 줄어드는 조건입니다. 하객이 200명 오신다면 일요일에도 50명분(약 275만원)을 추가로 내야 하므로 <b>실질 차액은 약 300만원</b>입니다. 사주 택일로도 2027년 9월 일요일은 전부 배제됐던 만큼 <b>토요일 선택이 합리적</b>이었습니다.</div>
+</div>
+
+<h2 class="sec"><span class="n">3</span>앞으로 늘어날 수 있는 비용</h2>
+<div class="card">
+  <ul>
+    <li><b>하객이 200명을 넘으면</b> — 초과분 식대를 예식 당일 추가 지불(1인 61,000원). 20명이면 122만원.</li>
+    <li><b>하객이 200명에 못 미쳐도</b> — 약관 제5조 4항에 따라 <b>200명분을 그대로 지불</b>합니다. 이 계약의 가장 큰 리스크입니다.</li>
+    <li>외부 스드메 비용 (홀 제안가는 140만원이었으니, 이보다 싸게 하면 이득)</li>
+    <li>부케 20만원 · 본식 스냅 70만원 · 혼주 미용 등</li>
+  </ul>
+  <div class="note warn"><b>200명이 적정한지 지금 계산해 보세요.</b> 양가 하객 리스트를 대략이라도 뽑아서 200명이 넘을 것 같으면 문제없지만, 180명 정도로 예상된다면 <b>보증인원을 낮출 수 있는지</b> 지금(계약 초기) 협의하는 게 낫습니다. 예식 3주 전에는 하향이 불가능합니다.</div>
+</div>
+</div>
+<div class="panel" id="w3">
+<h2 class="sec"><span class="n">★</span>우선순위 1 — 지금 바로</h2>
+<div class="card">
+  <h3>⓪ 웨딩 패키지 제외 · 예식 시간 12:30 변경 통보</h3>
+  <p>두 가지를 한 번에 요청해야 합니다. 약관 <b>제4조 2항</b>상 계약 내용 변경은 <b>사업자의 사전 서면 동의</b>가 필요하고, "변경 시 추가 비용이 발생할 수 있다"고 되어 있습니다.</p>
+  <h4>문자로 보낼 내용</h4>
+  <div class="note" style="border-color:var(--muted);background:var(--surface-2)">
+  안녕하세요, 2027년 9월 4일 루체홀 예약한 이주호·송지영입니다. 세 가지 확인 부탁드립니다.<br><br>
+  1. <b>웨딩 패키지(140만원)는 외부로 진행</b>하려 합니다. 이 경우 대관료 470만원, 식대 61,000원, 서비스 항목(주류·음료·포토테이블·플라워샤워·사회자 또는 본식영상) 조건은 <b>그대로 유지되는 것이 맞나요?</b><br>
+  2. 예식 시간을 <b>11:00 → 12:30으로 변경</b>하고 싶습니다. 가능한 슬롯인지, 변경 시 <b>추가 비용이 있는지</b> 알려주세요.<br>
+  3. 계약금 100만원은 <b>총액에서 차감</b>되는 것이 맞나요?
+  </div>
+  <p class="mini">답변을 문자로 받아두시고, 변경이 확정되면 <b>수정된 계약서를 다시 받으세요.</b> 구두 합의만으로는 나중에 확인이 어렵습니다.</p>
+</div>
+
+<div class="card">
+  <h3>① 제7조에 그어진 X가 무슨 뜻인지</h3>
+  <p>약관 <b>제7조(계약해제 및 위약금 기준)</b> 전체와 위약금 표에 손으로 <b>큰 X 표시</b>가 되어 있습니다. 이게 무엇을 의미하는지가 이 계약에서 가장 불명확한 부분입니다.</p>
+  <ul>
+    <li><b>"이 조항은 적용하지 않는다"</b>는 뜻이라면 계약자에게 유리합니다. 다만 그렇다면 <b>정정 서명이나 날인</b>이 있어야 효력이 분명해집니다.</li>
+    <li>단순히 <b>설명하면서 표시한 것</b>이라면 조항은 그대로 살아 있습니다.</li>
+  </ul>
+  <div class="note warn"><b>할 일</b> — 담당자에게 문자나 카톡으로 <b>"제7조에 X 표시된 건 어떤 의미인지"</b> 물어보고 <b>답변을 텍스트로 남겨두세요.</b> 통화보다 기록이 남는 방식이 좋습니다. 계약서 사본에 정정 날인을 받을 수 있으면 가장 확실합니다.</div>
+</div>
+
+<div class="card">
+  <h3>② 계약금 환불 조건이 문서마다 다릅니다</h3>
+  <table class="tbl">
+    <thead><tr><th>문서</th><th>내용</th></tr></thead>
+    <tbody>
+    <tr><td><b>약관 제3조</b></td><td>계약금은 <b>상담료로 간주, 언제 해제해도 환불 없음</b> (3항·4항)</td></tr>
+    <tr><td><b>박람회 견적서</b></td><td>계약 체결 후 <b>14일 이내 해제 시 10만원 공제 후 환급</b>, 15일부터 전액 미반환</td></tr>
+    <tr><td><b>가격표(Price List)</b></td><td>견적서와 동일 — <b>10만원 공제 후 환급</b>, 14일 이후 전액 미반환</td></tr>
+    </tbody>
+  </table>
+  <p>같은 업체가 준 세 문서가 서로 다릅니다. 일반적으로 이런 경우 <b>고객에게 유리한 쪽으로 해석</b>하는 것이 약관 해석의 원칙(작성자 불이익 원칙)입니다.</p>
+  <div class="note"><b>계약일이 2026년 8월 9일이므로, 14일 숙려 기간은 2026년 8월 23일까지입니다.</b> 재고하실 의사가 전혀 없다면 신경 쓰실 필요 없지만, 알고는 계시는 게 좋습니다.</div>
+</div>
+
+<div class="card">
+  <h3>③ 위약금 기준이 공정위 기준보다 불리합니다</h3>
+  <p>공정거래위원회 <b>소비자분쟁해결기준(예식업)</b>과 이 계약서 제7조를 나란히 두면 이렇습니다.</p>
+  <table class="tbl">
+    <thead><tr><th>해제 시점</th><th>공정위 기준</th><th>이 계약서</th></tr></thead>
+    <tbody>
+    <tr><td>90일 전까지</td><td style="color:var(--good)"><b>위약금 없음<br>계약금 환급</b></td><td style="color:var(--crit)">149일 전부터 <b>10%</b></td></tr>
+    <tr><td>89~60일 전</td><td>10%</td><td>10%</td></tr>
+    <tr><td>59~30일 전</td><td>20%</td><td>20%</td></tr>
+    <tr><td>29일~당일</td><td><b>35%</b></td><td style="color:var(--crit)">29~15일 <b>40%</b><br>14~4일 <b>50%</b><br>3일~당일 <b>100%</b></td></tr>
+    </tbody>
+  </table>
+  <p><b>차이가 나는 지점은 두 곳</b>입니다. ⑴ 공정위 기준은 90일 전까지 위약금이 없는데 이 계약서는 149일 전부터 10%를 부과하고, ⑵ 예식 임박 구간에서 최대 100%까지 올라갑니다.</p>
+  <div class="note"><b>알아두실 점</b> — 소비자분쟁해결기준은 법률이 아니라 <b>분쟁 조정 시 적용되는 권고 기준</b>입니다. 당사자 간 약정이 있으면 그 약정이 우선하는 것이 원칙이지만, <b>고객에게 부당하게 불리한 약관 조항은 약관규제법에 따라 무효로 판단될 수 있습니다.</b> 실제로 예식일 한참 전에 해제했는데 계약금을 돌려받지 못해 다툰 사례들이 있고, 법원이 소비자 손을 들어준 경우도 있습니다.<br><br>지금 당장 문제 삼을 일은 아니지만, <b>만에 하나 해제해야 할 상황이 오면 이 기준을 근거로 협의할 수 있다</b>는 것만 기억해 두세요. 저는 변호사가 아니므로, 실제 분쟁이 생기면 한국소비자원(1372) 상담을 먼저 받아보시길 권합니다.</div>
+</div>
+
+<h2 class="sec"><span class="n">2</span>우선순위 2 — 이번 주 안에</h2>
+
+<div class="card">
+  <h3>④ 약관 제5조 5항과 6항이 충돌합니다</h3>
+  <table class="tbl">
+    <tbody>
+    <tr><td><b>5항</b></td><td>보증인원보다 <b>추가된 인원의 식대는 당일 추가 지불</b></td></tr>
+    <tr><td><b>6항</b></td><td>당사는 보증인원의 <b>20% 추가 인원까지 음식을 제공</b></td></tr>
+    </tbody>
+  </table>
+  <p>6항을 문자 그대로 읽으면 200명 보증 시 <b>240명까지 추가 비용 없이</b> 식사가 제공된다는 뜻이 됩니다. 5항과는 반대되는 내용이라, 실제로는 <b>"20%까지는 음식을 여유 있게 준비하되 초과분은 당일 정산"</b>이라는 업계 관행을 잘못 적힌 것일 가능성이 큽니다.</p>
+  <div class="note warn"><b>할 일</b> — <b>"200명 보증인데 220명이 오면 20명분을 추가로 내는 것인지"</b> 명확히 물어보세요. 20명이면 122만원 차이입니다. 답변을 문자로 받아두세요.</div>
+</div>
+
+<div class="card">
+  <h3>⑤ 개인정보 동의란이 비어 있습니다</h3>
+  <p>약관 제8조 3항의 <b>□ 동의 / □ 비동의</b> 체크박스가 <b>둘 다 공란</b>인 상태로 서명이 되어 있습니다. 제3자 제공·마케팅 활용에 대한 동의 항목입니다.</p>
+  <p>큰 문제는 아니지만, 원치 않으시면 <b>비동의로 체크</b>해 두시는 편이 좋습니다. 협력업체로부터 연락이 오는 것을 줄일 수 있습니다. 동의를 거부해도 계약 자체에는 영향이 없고, 일부 편의 제공만 제한된다고 명시돼 있습니다.</p>
+</div>
+
+<div class="card">
+  <h3>⑥ 입금 계좌 예금주가 업체명과 다릅니다</h3>
+  <table class="tbl"><tbody>
+    <tr><td>업체명</td><td>CA웨딩컨벤션</td></tr>
+    <tr><td>입금 계좌</td><td>농협 301-0219-8314-11</td></tr>
+    <tr><td>예금주</td><td><b>에이엠푸드네트웍스</b></td></tr>
+  </tbody></table>
+  <p>운영 법인이 별도인 경우가 많아 통상적인 일이긴 합니다. 다만 <b>사업자등록증상 상호와 대표자명</b>을 한 번 확인해 두시고, 잔금도 같은 계좌로 넣는 것인지 확인해 두세요. <b>영수증은 반드시 보관</b>하시고요.</p>
+</div>
+
+<h2 class="sec"><span class="n">3</span>계약 조건 중 기억할 것</h2>
+<div class="card">
+  <table class="tbl">
+    <thead><tr><th>조항</th><th>내용</th></tr></thead>
+    <tbody>
+    <tr><td><b>보증인원</b><br><span class="mini">제4조 1항</span></td><td>예식 <b>3주 전</b>까지 확정. 이후 <b>하향 불가</b>, 상향만 가능</td></tr>
+    <tr><td><b>미달 시</b><br><span class="mini">제5조 4항</span></td><td>하객이 적어도 <b>보증인원 100% 지불</b></td></tr>
+    <tr><td><b>외부업체</b><br><span class="mini">제6조</span></td><td>주류·사진·영상·장식 등 외부 업체 사용 시 <b>사전 승인 필수</b>. 승인 없이 쓰면 사업자 면책</td></tr>
+    <tr><td><b>원판 촬영</b></td><td>홀 대관에 포함이며 <b>외부 촬영 불가</b> (필수)</td></tr>
+    <tr><td><b>제휴업체</b><br><span class="mini">제9조</span></td><td>소개만 할 뿐, 제휴업체와의 계약 책임은 <b>업체에게</b> 있음 — 스드메 계약은 별도로 꼼꼼히</td></tr>
+    <tr><td><b>보안</b><br><span class="mini">제10조</span></td><td>식대·대관료 등 계약 내용 <b>외부 공유 금지</b>. 유출 시 혜택 철회 가능<br><span class="mini">→ 커뮤니티나 카페에 견적 사진 올리는 것은 피하세요</span></td></tr>
+    <tr><td><b>관할</b><br><span class="mini">제11조</span></td><td>분쟁 시 <b>사업장 소재지(아산) 관할 법원</b> 전속</td></tr>
+    <tr><td><b>시식</b></td><td>예식 <b>3일 전부터 2인 무료</b> · 사전 예약 필요</td></tr>
+    <tr><td><b>주차</b></td><td>하객 <b>2시간 무료</b> · 혼주/가족 차량 무료 (주차 등록 필수)</td></tr>
+    </tbody>
+  </table>
+</div>
+</div>
+
+<div class="panel" id="w4">
+<h2 class="sec"><span class="n">1</span>주요 시점</h2>
+<div class="card">
+  <table class="tbl">
+    <thead><tr><th>날짜</th><th>D-day</th><th>내용</th></tr></thead>
+    <tbody>
+    <tr><td class="n">2026-08-09</td><td class="n">D-391</td><td>계약 체결 · 계약금 100만원 납부 <span class="pill">완료</span></td></tr>
+    <tr><td class="n" style="color:var(--crit)"><b>2026-08-23</b></td><td class="n">D-377</td><td><b>14일 숙려 기간 만료</b><br><span class="mini">견적서·가격표 기준. 이후 계약금 전액 미반환</span></td></tr>
+    <tr><td class="n">2027-04</td><td class="n">D-150</td><td>본식 스냅 예약 마감 (5개월 전 조건)</td></tr>
+    <tr><td class="n">2027-04</td><td class="n">D-150</td><td>본식 영상 예약 마감 (5개월 전 조건)</td></tr>
+    <tr><td class="n" style="color:var(--warn)"><b>2027-06-06</b></td><td class="n">D-90</td><td><b>공정위 기준상 위약금 없이 해제 가능한 마지막 날</b><br><span class="mini">계약서 제7조와는 다름 — '확인할 것' 탭 참조</span></td></tr>
+    <tr><td class="n">2027-07-06</td><td class="n">D-60</td><td>위약금 10% → 20% 구간 전환</td></tr>
+    <tr><td class="n">2027-08-05</td><td class="n">D-30</td><td>위약금 20% → 40% 구간 전환</td></tr>
+    <tr><td class="n" style="color:var(--crit)"><b>2027-08-14</b></td><td class="n">D-21</td><td><b>보증인원 최종 확정 마감</b><br><span class="mini">이후 하향 불가 — 이 날짜가 실질적으로 가장 중요합니다</span></td></tr>
+    <tr><td class="n">2027-09-01</td><td class="n">D-3</td><td>시식 가능 시작 (2인 무료 · 사전 예약)</td></tr>
+    <tr><td class="n" style="color:var(--good)"><b>2027-09-04</b></td><td class="n">D-day</td><td><b>예식 12:30 · 루체홀</b> <span class="pill">변경 예정</span><br><span class="mini">연회 이용 12:00~14:30 (2시간 30분)</span></td></tr>
+    </tbody>
+  </table>
+</div>
+
+<h2 class="sec"><span class="n">2</span>사주 택일과의 관계</h2>
+<div class="card">
+  <p>계약하신 <b>2027년 9월 4일(토) 11:00</b>은 앞서 계산한 택일 결과와 이렇게 맞물립니다.</p>
+  <ul>
+    <li><b>2027 하반기~2028년 주말 택일 1위</b> (84점) — 2위와 10점 차이</li>
+    <li>신부 호랑이띠의 <b>대리월(음력 8월)</b></li>
+    <li>일진 <b>丙戌</b> — 신부 일간과 <b>丙辛합(정관)</b>, 신부의 卯와 <b>卯戌합</b></li>
+    <li>황도 <b>사명일</b> · 건제 <b>만일</b></li>
+    <li>시간은 11:00(巳시·명당)에서 <b>12:30(午시·천형)</b>으로 변경 예정 — 한 등급 내려가지만 <b>午시는 신부 천을귀인</b>이라 상당 부분 상쇄됩니다</li>
+    <li>추석(9/15)과 11일 간격이라 연휴와 무관</li>
+  </ul>
+  <div class="note good">가격 조건과 택일이 동시에 최적인 날입니다. 시간대는 한 등급 내려가지만, 택일에서 시간은 날짜의 보조 요소이므로 무방합니다. 자세한 비교는 「시간 변경」 탭에 있습니다.</div>
+</div>
+</div>
+
+<div class="panel" id="w5">
+<h2 class="sec"><span class="n">1</span>다음에 정리할 것</h2>
+<div class="card">
+  <p>박람회에서 받아오신 다른 상담 자료를 하나씩 주시면 같은 형식으로 이어서 정리하겠습니다.</p>
+  <table class="tbl">
+    <thead><tr><th>항목</th><th>상태</th></tr></thead>
+    <tbody>
+    <tr><td><b>홀 (CA웨딩컨벤션)</b></td><td><span class="pill" style="background:rgba(12,163,12,.13);color:var(--good);border:none">계약 완료</span></td></tr>
+    <tr><td><b>스튜디오 · 드레스 · 메이크업</b></td><td><span class="pill" style="background:var(--s2-wash);color:var(--s2);border:none">외부 진행 확정</span> 홀 제안가 140만원 — 이보다 저렴하면 이득</td></tr>
+    <tr><td>예물 · 예단</td><td>대기</td></tr>
+    <tr><td>한복</td><td>대기</td></tr>
+    <tr><td>신혼여행</td><td>대기</td></tr>
+    <tr><td>가전 · 가구</td><td>대기</td></tr>
+    <tr><td>본식 스냅 / 영상</td><td>미정 — 5개월 전 예약 마감</td></tr>
+    <tr><td>청첩장</td><td>미정</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<h2 class="sec"><span class="n">2</span>할 일 체크리스트</h2>
+<div class="card">
+  <h4>이번 주</h4>
+  <ul>
+    <li><b>웨딩 패키지 제외 + 예식 시간 12:30 변경</b> 통보 및 조건 유지 확인 <b>(최우선)</b></li>
+    <li>담당자에게 <b>제7조 X 표시</b> 의미 문의 (문자로)</li>
+    <li><b>보증인원 20% 초과분</b> 정산 방식 확인</li>
+    <li>계약금 100만원 <b>총액 차감</b> 여부 확인</li>
+    <li>변경 확정 후 <b>수정 계약서 재발급</b> 요청</li>
+    <li>개인정보 <b>동의/비동의</b> 체크 정리</li>
+    <li>계약서·견적서·가격표 <b>사진 백업</b> (이미 촬영해 두셨으니 클라우드에 저장)</li>
+  </ul>
+  <h4>이번 달</h4>
+  <ul>
+    <li>양가 <b>하객 수 러프 집계</b> → 200명이 적정한지 판단</li>
+    <li><b>사회자 vs 본식 영상</b> 중 서비스 항목 선택</li>
+    <li><b>외부 스드메 업체</b> 비교 — 홀 제안가 140만원이 기준선</li>
+    <li>사업자등록증 상호·대표자 확인</li>
+  </ul>
+  <h4>2027년 4월까지</h4>
+  <ul>
+    <li>본식 스냅 · 본식 영상 예약 (5개월 전 마감)</li>
+    <li>외부 업체(헤어메이크업 팀 · 스냅 작가) <b>사전 승인</b> 요청 — 약관 제6조</li>
+  </ul>
+</div>
+</div>
+
+
+<footer>
+  <p><b>정리 근거</b> — 2026년 8월 9일 CA웨딩컨벤션 박람회 현장에서 받으신 ①예식 계약 약관 ②예식·연회 계약서 ③박람회 견적서 ④Wedding Price List 4개 문서를 대조해 작성했습니다. 견적서 금액은 항목별로 역산해 검증했으며, <b>웨딩 패키지를 제외한 총액 17,250,000원은 견적서의 '박람회 혜택가'와 정확히 일치</b>합니다(대관 4,700,000 + 컨시어지 350,000 + 식대 200명×61,000).</p>
+  <p><b>v2 변경사항</b> — ⑴ 웨딩 패키지(1,400,000원)와 부속 헬퍼비(180,000원)를 외부 진행으로 제외 ⑵ 예식 시간 11:00 → 12:30 변경 예정 반영 및 시주 분석 추가. 총액 18,830,000원 → <b>17,250,000원</b>.</p>
+  <p><b>공정위 기준</b> — 소비자분쟁해결기준(예식업) 위약금 기준은 공표 자료를 확인해 반영했습니다. 이 기준은 법률이 아니라 분쟁 조정 시 적용되는 권고 기준입니다.</p>
+  <p><b>유의</b> — 본 문서는 계약 내용을 읽기 쉽게 정리한 참고 자료이며 법률 자문이 아닙니다. 계약 해석이나 분쟁에 관한 판단이 필요하시면 한국소비자원(국번없이 1372) 또는 법률 전문가와 상담하시기 바랍니다.</p>
+</footer>
+</div>
+
+<script>
+const tabs=[...document.querySelectorAll('.tab')];
+function show(id){
+  tabs.forEach(t=>t.setAttribute('aria-selected',t.dataset.t===id));
+  document.querySelectorAll('.panel').forEach(p=>p.classList.toggle('on',p.id===id));
+  window.scrollTo({top:0,behavior:'instant'});
+}
+tabs.forEach(t=>t.addEventListener('click',()=>show(t.dataset.t)));
+const tb=document.getElementById('tbtn');
+tb.addEventListener('click',()=>{
+  const r=document.documentElement;
+  const cur=r.getAttribute('data-theme');
+  const sysDark=matchMedia('(prefers-color-scheme:dark)').matches;
+  r.setAttribute('data-theme', cur==='dark' ? 'light' : (cur==='light' ? 'dark' : (sysDark?'light':'dark')));
+});
+// bar grow-in
+addEventListener('load',()=>{
+  document.querySelectorAll('.bar[data-w]').forEach(b=>{b.style.width=b.dataset.w});
+});
+</script>
+</body>
+</html>
