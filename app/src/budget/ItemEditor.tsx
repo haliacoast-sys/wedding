@@ -13,6 +13,7 @@ import { useEffect, useRef, useState } from 'react'
 import { MoneyInput } from './MoneyInput'
 import { VendorPicker } from './VendorPicker'
 import { todayISO } from './dates'
+import { formatWon } from './money'
 import { useUpdateItem } from './useBudget'
 import { CATEGORY_SUGGESTIONS, draftOf } from './types'
 import type { BudgetItem, BudgetItemUpdate, ItemDraft, Vendor } from './types'
@@ -220,6 +221,19 @@ export const ItemEditor = ({ item, vendors, categories, onClose, onDelete }: Ite
           onBlur={() => commit({ memo: draft.memo.trim() || null })}
         />
       </label>
+
+      {/* 시세 근거는 사용자가 입력한 값이 아니라 외부 조사 결과다.
+          편집 대상이 아니므로 읽기 전용으로 두고, 길어서 기본은 접어 둔다.
+          숫자만 보고 협상하다 낭패를 보지 않도록 출처·조사 시점·지역 기준을 그대로 보여준다. */}
+      {item.market_note && (
+        <details className="bd-market">
+          <summary className="bd-market__summary">
+            시세 근거
+            {item.market_avg != null && <b> · {formatWon(item.market_avg)}</b>}
+          </summary>
+          <p className="bd-market__body">{item.market_note}</p>
+        </details>
+      )}
 
       <div className="bd-editor__foot">
         <button type="button" className="bd-btn bd-btn--danger" onClick={() => onDelete(item)}>

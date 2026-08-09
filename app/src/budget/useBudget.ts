@@ -72,6 +72,10 @@ const materialize = (row: ItemInsertRow): BudgetItem => {
     paid_at: row.paid_at ?? null,
     vendor_id: row.vendor_id ?? null,
     memo: row.memo ?? null,
+    // 시세는 조사로 채우는 값이라 사용자가 새로 만든 항목에는 없다.
+    // 되살리기의 경우에도 서버 왕복 후 원래 값이 돌아온다.
+    market_avg: row.market_avg ?? null,
+    market_note: row.market_note ?? null,
     // 되살리기(삭제 취소)는 원래 created_at 을 그대로 넘긴다. 그래야 목록에서
     // 지우기 전 자리로 돌아온다. 새로 만들 때는 지금 시각.
     created_at: row.created_at ?? now,

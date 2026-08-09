@@ -62,6 +62,8 @@ export type Database = {
           estimate: number | null
           id: string
           label: string
+          market_avg: number | null
+          market_note: string | null
           memo: string | null
           paid_at: string | null
           updated_at: string
@@ -74,6 +76,8 @@ export type Database = {
           estimate?: number | null
           id?: string
           label: string
+          market_avg?: number | null
+          market_note?: string | null
           memo?: string | null
           paid_at?: string | null
           updated_at?: string
@@ -86,6 +90,8 @@ export type Database = {
           estimate?: number | null
           id?: string
           label?: string
+          market_avg?: number | null
+          market_note?: string | null
           memo?: string | null
           paid_at?: string | null
           updated_at?: string

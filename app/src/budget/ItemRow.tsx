@@ -59,6 +59,29 @@ export const ItemRow = ({ item, vendorName, expanded, onToggle }: ItemRowProps) 
         )}
         {hasActual && item.estimate == null && <span className="bd-row__sub">견적 없음</span>}
         {!hasActual && item.estimate != null && <span className="bd-row__sub">실제 미입력</span>}
+
+        {/* 시세는 견적(=업체가 부른 값)과 비교한다. 실제 지출과 비교하면
+            "얼마에 계약했어야 했나"가 아니라 "얼마 썼나"가 되어 판단에 쓸 수 없다.
+            차액이 양수면 시세보다 비싸게 부른 것이므로 초과와 같은 색을 쓴다. */}
+        {item.market_avg != null && (
+          <span className="bd-row__sub bd-row__market">
+            시세 {formatWon(item.market_avg)}
+            {item.estimate != null && item.estimate !== item.market_avg && (
+              <b
+                className={
+                  item.estimate > item.market_avg
+                    ? 'bd-delta bd-delta--over'
+                    : 'bd-delta bd-delta--under'
+                }
+              >
+                {formatSignedWon(item.estimate - item.market_avg)}
+              </b>
+            )}
+            {item.estimate != null && item.estimate === item.market_avg && (
+              <b className="bd-delta">시세와 같음</b>
+            )}
+          </span>
+        )}
       </span>
     </button>
   )

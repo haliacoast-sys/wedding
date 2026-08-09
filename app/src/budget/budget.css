@@ -767,6 +767,48 @@
   white-space: nowrap;
 }
 
+/* ── 시세 근거 (읽기 전용) ── */
+.bd-market {
+  margin: 10px 0 2px;
+  background: var(--surface-2);
+  border: 1px solid var(--hair);
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.bd-market__summary {
+  cursor: pointer;
+  padding: 10px 12px;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--ink-2);
+  /* 요약 줄도 손가락으로 눌러야 한다. 44px 을 넘기려면 padding 만으로는 모자란다. */
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.bd-market__body {
+  margin: 0;
+  padding: 0 12px 12px;
+  font-size: 12.5px;
+  line-height: 1.65;
+  color: var(--ink-2);
+  /* 긴 출처 URL 이 들어 있어 그냥 두면 가로 스크롤이 생긴다. */
+  overflow-wrap: anywhere;
+  white-space: pre-wrap;
+}
+
+/* 시세 줄은 업체가 부른 값이 아니라 외부 조사값이라, 위의 견적·실제와
+   출처가 다르다는 것이 한눈에 보이도록 얇은 구분선을 둔다. */
+.bd-row__market {
+  display: block;
+  margin-top: 3px;
+  padding-top: 3px;
+  border-top: 1px dashed var(--hair);
+}
+
 .bd-delta {
   margin-left: 5px;
   font-weight: 700;
