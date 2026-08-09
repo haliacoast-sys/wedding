@@ -197,6 +197,7 @@ p.lede{color:var(--ink-2);font-size:13.5px;margin:4px 0 14px}
 }
 .note.warn{border-color:var(--warn);background:rgba(250,178,25,.10)}
 .note.good{border-color:var(--good);background:rgba(12,163,12,.09)}
+.note.crit{border-color:var(--crit);background:rgba(208,59,59,.09)}
 .note b{font-weight:700}
 
 details{background:var(--surface);border:1px solid var(--hair);border-radius:12px;margin:0 0 10px;overflow:hidden}
@@ -242,8 +243,9 @@ footer{margin:32px 0 10px;padding-top:18px;border-top:1px solid var(--hair);font
 <h2 class="sec"><span class="n">◆</span>계약 요약</h2>
 <div class="card" style="text-align:center">
   <div style="font-size:13px;color:var(--muted);font-weight:700;letter-spacing:.05em">홀 계약 총액</div>
-  <div class="hero-fig" style="margin:6px 0">1,725<span style="font-size:22px">만원</span></div>
-  <p class="mini">계약금 100만원 납부 완료 · 앞으로 낼 돈 <b>1,625만원</b></p>
+  <div class="hero-fig" style="margin:6px 0">1,705<span style="font-size:22px">만원</span></div>
+  <p class="mini">계약금 100만원 납부 완료 · 앞으로 낼 돈 <b>1,605만원</b></p>
+  <p class="mini" style="color:var(--good)">계약 후기 이벤트로 식대 −1,000원/인 (200명 −20만원) 적용</p>
 </div>
 <div class="card">
   <dl class="kv">
@@ -265,11 +267,14 @@ footer{margin:32px 0 10px;padding-top:18px;border-top:1px solid var(--hair);font
     <tr><td>컨시어지 (필수)</td><td class="n">350,000</td></tr>
     <tr><td>식대 200명 × 61,000</td><td class="n">12,200,000</td></tr>
     <tr><td>주류 · 음료</td><td class="n" style="color:var(--good)">서비스</td></tr>
-    <tr style="border-top:2px solid var(--axis)"><td><b>총액</b></td><td class="n"><b>17,250,000</b></td></tr>
+    <tr style="border-top:2px solid var(--axis)"><td>견적서 총액</td><td class="n">17,250,000</td></tr>
+    <tr><td>계약 후기 이벤트 <span class="mini">식대 −1,000원 × 200명</span></td><td class="n" style="color:var(--good)">−200,000</td></tr>
+    <tr style="border-top:2px solid var(--axis)"><td><b>총액</b></td><td class="n"><b>17,050,000</b></td></tr>
     <tr><td>계약금 (기납부)</td><td class="n">−1,000,000</td></tr>
-    <tr style="border-top:1px solid var(--axis)"><td><b>잔금</b></td><td class="n"><b>16,250,000</b></td></tr>
+    <tr style="border-top:1px solid var(--axis)"><td><b>잔금</b></td><td class="n"><b>16,050,000</b></td></tr>
   </tbody></table>
-  <div class="note good"><b>총액이 견적서의 '박람회 혜택가 17,250,000원'과 정확히 일치합니다.</b> 웨딩 패키지를 빼면서 금액이 깔끔해졌고, 이전에 불확실했던 140만원 논란도 사라졌습니다.</div>
+  <div class="note good"><b>견적서 총액 17,250,000원은 '박람회 혜택가'와 정확히 일치합니다.</b> 웨딩 패키지를 빼면서 금액이 깔끔해졌고, 이전에 불확실했던 140만원 논란도 사라졌습니다. 여기에 <b>계약 후기 이벤트로 식대 1인당 1,000원 할인</b>이 추가되어 실제 총액은 17,050,000원입니다.</div>
+  <div class="note warn"><b>확인 필요</b> — 후기 이벤트 할인은 구두로 확정받은 것입니다. <b>수정 견적서나 계약서에 반영된 문서를 반드시 받아두세요.</b> 잔금 정산 때 구두 합의만으로는 근거가 없습니다. 함께 확인할 것 — <b>200명 초과분 식대에도 60,000원이 적용되는지</b>. 초과분에 61,000원을 그대로 적용하면 인원이 늘수록 차액이 커집니다.</div>
 </div>
 
 <h2 class="sec"><span class="n">◇</span>세 줄 평</h2>
@@ -462,7 +467,7 @@ footer{margin:32px 0 10px;padding-top:18px;border-top:1px solid var(--hair);font
 <h2 class="sec"><span class="n">3</span>앞으로 늘어날 수 있는 비용</h2>
 <div class="card">
   <ul>
-    <li><b>하객이 200명을 넘으면</b> — 초과분 식대를 예식 당일 추가 지불(1인 61,000원). 20명이면 122만원.</li>
+    <li><b>하객이 200명을 넘으면</b> — 초과분 식대를 예식 당일 추가 지불(1인 61,000원 기준, 20명이면 122만원). <b>후기 이벤트 할인가 60,000원이 초과분에도 적용되는지는 확인되지 않았습니다.</b></li>
     <li><b>하객이 200명에 못 미쳐도</b> — 약관 제5조 4항에 따라 <b>200명분을 그대로 지불</b>합니다. 이 계약의 가장 큰 리스크입니다.</li>
     <li>외부 스드메 비용 (홀 제안가는 140만원이었으니, 이보다 싸게 하면 이득)</li>
     <li>부케 20만원 · 본식 스냅 70만원 · 혼주 미용 등</li>
@@ -486,13 +491,11 @@ footer{margin:32px 0 10px;padding-top:18px;border-top:1px solid var(--hair);font
 </div>
 
 <div class="card">
-  <h3>① 제7조에 그어진 X가 무슨 뜻인지</h3>
-  <p>약관 <b>제7조(계약해제 및 위약금 기준)</b> 전체와 위약금 표에 손으로 <b>큰 X 표시</b>가 되어 있습니다. 이게 무엇을 의미하는지가 이 계약에서 가장 불명확한 부분입니다.</p>
-  <ul>
-    <li><b>"이 조항은 적용하지 않는다"</b>는 뜻이라면 계약자에게 유리합니다. 다만 그렇다면 <b>정정 서명이나 날인</b>이 있어야 효력이 분명해집니다.</li>
-    <li>단순히 <b>설명하면서 표시한 것</b>이라면 조항은 그대로 살아 있습니다.</li>
-  </ul>
-  <div class="note warn"><b>할 일</b> — 담당자에게 문자나 카톡으로 <b>"제7조에 X 표시된 건 어떤 의미인지"</b> 물어보고 <b>답변을 텍스트로 남겨두세요.</b> 통화보다 기록이 남는 방식이 좋습니다. 계약서 사본에 정정 날인을 받을 수 있으면 가장 확실합니다.</div>
+  <h3>① 제7조 표시 <span class="pill" style="background:rgba(12,163,12,.16);color:var(--good);border:none">확인 완료</span></h3>
+  <p>약관 <b>제7조(계약해제 및 위약금 기준)</b> 전체와 위약금 표에 손으로 표시가 되어 있습니다. 이 문서의 이전 판에서는 이를 <b>X 표시</b>로 읽고 "조항을 적용하지 않는다는 뜻일 수 있다"는 가능성을 남겨 두었습니다.</p>
+  <p><b>확인 결과 이 표시는 X가 아니라 별표(★)이며, 담당자가 "중요한 조항"이라고 짚어 준 것이었습니다.</b></p>
+  <div class="note crit"><b>결론이 반대입니다</b> — 제7조는 무효화된 것이 아니라 <b>그대로 살아 있습니다.</b> 조항이 지워졌을 가능성에 기대면 안 되고, 아래 ③에서 지적한 <b>"위약금 기준이 공정위 기준보다 불리하다"는 문제가 실제로 적용됩니다.</b></div>
+  <p class="mini">문의할 일은 없어졌지만 위험은 남았습니다. 해제 가능성을 조금이라도 고려한다면 ③의 비교표에서 <b>공정위 기준(90일 전까지 위약금 없음)과 이 계약서(149일 전부터 10%)의 차이</b>를 먼저 계산해 보세요.</p>
 </div>
 
 <div class="card">
@@ -633,7 +636,7 @@ footer{margin:32px 0 10px;padding-top:18px;border-top:1px solid var(--hair);font
   <h4>이번 주</h4>
   <ul>
     <li><b>웨딩 패키지 제외 + 예식 시간 12:30 변경</b> 통보 및 조건 유지 확인 <b>(최우선)</b></li>
-    <li>담당자에게 <b>제7조 X 표시</b> 의미 문의 (문자로)</li>
+    <li><b>후기 이벤트 식대 할인</b>(−1,000원/인)이 반영된 수정 견적서 받기 · 초과분에도 적용되는지 확인</li>
     <li><b>보증인원 20% 초과분</b> 정산 방식 확인</li>
     <li>계약금 100만원 <b>총액 차감</b> 여부 확인</li>
     <li>변경 확정 후 <b>수정 계약서 재발급</b> 요청</li>
@@ -659,6 +662,7 @@ footer{margin:32px 0 10px;padding-top:18px;border-top:1px solid var(--hair);font
 <footer>
   <p><b>정리 근거</b> — 2026년 8월 9일 CA웨딩컨벤션 박람회 현장에서 받으신 ①예식 계약 약관 ②예식·연회 계약서 ③박람회 견적서 ④Wedding Price List 4개 문서를 대조해 작성했습니다. 견적서 금액은 항목별로 역산해 검증했으며, <b>웨딩 패키지를 제외한 총액 17,250,000원은 견적서의 '박람회 혜택가'와 정확히 일치</b>합니다(대관 4,700,000 + 컨시어지 350,000 + 식대 200명×61,000).</p>
   <p><b>v2 변경사항</b> — ⑴ 웨딩 패키지(1,400,000원)와 부속 헬퍼비(180,000원)를 외부 진행으로 제외 ⑵ 예식 시간 11:00 → 12:30 변경 예정 반영 및 시주 분석 추가. 총액 18,830,000원 → <b>17,250,000원</b>.</p>
+  <p><b>v3 변경사항</b> — ⑴ 제7조에 표시된 것이 X가 아니라 <b>별표(★, 중요 표시)</b>임을 확인. 조항이 무효화된 것이 아니므로 위약금 기준이 그대로 적용된다는 쪽으로 결론이 바뀌었습니다 ⑵ 계약 후기 이벤트로 <b>식대 1인당 1,000원 할인</b> 확정. 총액 17,250,000원 → <b>17,050,000원</b>, 잔금 <b>16,050,000원</b>. 견적서에 적힌 금액 자체는 17,250,000원이므로 견적서를 설명하는 표들은 그대로 두었습니다.</p>
   <p><b>공정위 기준</b> — 소비자분쟁해결기준(예식업) 위약금 기준은 공표 자료를 확인해 반영했습니다. 이 기준은 법률이 아니라 분쟁 조정 시 적용되는 권고 기준입니다.</p>
   <p><b>유의</b> — 본 문서는 계약 내용을 읽기 쉽게 정리한 참고 자료이며 법률 자문이 아닙니다. 계약 해석이나 분쟁에 관한 판단이 필요하시면 한국소비자원(국번없이 1372) 또는 법률 전문가와 상담하시기 바랍니다.</p>
 </footer>
