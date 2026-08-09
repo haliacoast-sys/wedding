@@ -2,7 +2,7 @@
 
 이주호 · 송지영 결혼 준비 자료실.
 
-**[→ 문서 열기](https://topar12.github.io/wedding/)**
+**[→ 문서 열기](https://haliacoast-sys.github.io/wedding/)**
 
 ## 내용
 
