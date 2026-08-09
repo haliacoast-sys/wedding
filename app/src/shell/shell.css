@@ -1,0 +1,216 @@
+/* ============================================================
+   shell.css — 앱 껍데기(헤더 + 하단 네비) 전용 스타일
+
+   규칙
+   1. 색은 전부 tokens.css 의 변수에서 나온다. 하드코딩된 색상값은 없다.
+      워시가 필요하면 color-mix() 로 토큰에서 만든다.
+   2. 클래스는 전부 sh- 접두어. index.css 의 공용 .card/.pill/.tab 과 겹치지 않는다.
+      (특히 .tab 은 wedding.html 의 알약 탭이라 여기서 쓰면 안 된다.)
+   3. 다른 모듈이 참조할 수 있는 값은 :root 의 커스텀 프로퍼티로 노출한다.
+   ============================================================ */
+
+:root {
+  /* 하단 네비 본체 높이(안전영역 제외). 탭 버튼의 터치 타겟이기도 하다(≥44px). */
+  --sh-nav-h: 58px;
+  /* 화면 바닥에서 네비가 실제로 먹는 높이. 홈 인디케이터 여백까지 포함한다.
+     하단에 떠 있는 요소(FAB, 스낵바 등)는 이 값을 기준으로 위로 띄우면 된다.
+       bottom: calc(var(--sh-nav-total) + 12px); */
+  --sh-nav-total: calc(var(--sh-nav-h) + var(--safe-bottom, 0px));
+}
+
+/* index.css 는 하단 고정 바를 가정해 body 에 64px 여백을 미리 잡아 둔다.
+   셸에서는 .sh-main 이 그 여백을 정확한 값으로 직접 소유하므로 중복을 없앤다.
+   :has 를 지원하지 않는 브라우저에서는 페이지 맨 아래 여백이 조금 남을 뿐이다. */
+body:has(.sh-shell) {
+  padding-bottom: 0;
+}
+
+.sh-shell {
+  min-height: 100svh;
+}
+
+.sh-shell *,
+.sh-shell *::before,
+.sh-shell *::after {
+  box-sizing: border-box;
+}
+
+.sh-shell :focus-visible {
+  outline: 2px solid var(--s1);
+  outline-offset: 2px;
+  border-radius: 10px;
+}
+
+/* ── 상단 헤더 ────────────────────────────────────────────
+   문서 흐름에 있다(fixed/sticky 아님). 스크롤하면 그대로 위로 사라지고,
+   상단은 각 화면이 자유롭게 쓸 수 있게 비워 둔다. */
+
+.sh-header {
+  padding: calc(var(--safe-top, 0px) + 6px) calc(14px + var(--safe-right, 0px)) 6px
+    calc(14px + var(--safe-left, 0px));
+  border-bottom: 1px solid var(--hair);
+  background: var(--plane);
+}
+
+.sh-header__inner {
+  max-width: 720px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.sh-header__brand {
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: -.02em;
+  color: var(--ink);
+  white-space: nowrap;
+}
+
+.sh-header__who {
+  flex: 1 1 auto;
+  min-width: 0;
+  font-size: 12px;
+  color: var(--muted);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.sh-header__who::before {
+  content: "·";
+  margin-right: 6px;
+  color: var(--hair);
+}
+
+.sh-signout {
+  flex: 0 0 auto;
+  /* 터치 타겟 44px. 헤더는 스크롤과 함께 사라지므로 세로 공간을 상시 점유하지 않는다. */
+  min-height: 44px;
+  min-width: 44px;
+  padding: 0 14px;
+  border: 1px solid var(--hair);
+  border-radius: 999px;
+  background: var(--surface);
+  color: var(--ink-2);
+  font: inherit;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.sh-signout:active {
+  background: var(--surface-2);
+}
+
+/* ── 콘텐츠 ───────────────────────────────────────────────
+   폭은 각 화면이 알아서 정한다(홈은 .wrap, 체크리스트는 .ck-app).
+   셸은 하단 네비에 가리지 않을 여백만 책임진다. */
+
+.sh-main {
+  padding-bottom: calc(var(--sh-nav-total) + 10px);
+}
+
+/* ── 하단 고정 네비게이션 ──────────────────────────────────
+   어느 화면에 있든 한 번에 홈으로 갈 수 있어야 한다는 요구를 담당한다. */
+
+.sh-nav {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  /* 체크리스트의 모달(60)·FAB(70)보다 낮게 둔다. 모달이 뜨면 네비를 덮는 편이 맞다. */
+  z-index: 50;
+  background: var(--surface);
+  border-top: 1px solid var(--hair);
+  /* 아이폰 홈 인디케이터. 이 줄이 없으면 제스처 바에 버튼이 가린다. */
+  padding-bottom: var(--safe-bottom, 0px);
+  padding-left: var(--safe-left, 0px);
+  padding-right: var(--safe-right, 0px);
+}
+
+/* 반투명은 backdrop-filter 가 실제로 먹을 때만. 지원하지 않으면 불투명 유지. */
+@supports (backdrop-filter: blur(12px)) or (-webkit-backdrop-filter: blur(12px)) {
+  .sh-nav {
+    background: color-mix(in srgb, var(--surface) 82%, transparent);
+    -webkit-backdrop-filter: blur(14px) saturate(140%);
+    backdrop-filter: blur(14px) saturate(140%);
+  }
+}
+
+.sh-nav__list {
+  display: flex;
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 0;
+  list-style: none;
+}
+
+.sh-nav__list > li {
+  flex: 1 1 0;
+  display: flex;
+  min-width: 0;
+}
+
+.sh-tab {
+  flex: 1 1 auto;
+  /* 터치 타겟: 높이 58px, 폭은 4분할이라 360px 화면에서도 90px. 둘 다 44px 이상. */
+  min-height: var(--sh-nav-h);
+  min-width: 44px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  padding: 5px 2px 4px;
+  border: 0;
+  background: none;
+  color: var(--muted);
+  font: inherit;
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: -.03em;
+  line-height: 1.25;
+  cursor: pointer;
+  transition: color .15s;
+}
+
+.sh-tab__icon {
+  display: grid;
+  place-items: center;
+  width: 46px;
+  height: 26px;
+  border-radius: 999px;
+  transition: background .15s;
+}
+
+.sh-tab__label {
+  white-space: nowrap;
+}
+
+/* 활성 탭: 색(muted → s1) · 굵기(600 → 800) · 아이콘 뒤 워시 · 선 굵기(1.6 → 2.0).
+   색맹·저조도에서도 구분되도록 색 하나에만 기대지 않는다. */
+.sh-tab[aria-current="page"] {
+  color: var(--s1);
+  font-weight: 800;
+}
+
+.sh-tab[aria-current="page"] .sh-tab__icon {
+  background: var(--s1-wash);
+}
+
+.sh-tab:active .sh-tab__icon {
+  transform: scale(.92);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sh-tab,
+  .sh-tab__icon {
+    transition: none;
+  }
+
+  .sh-tab:active .sh-tab__icon {
+    transform: none;
+  }
+}

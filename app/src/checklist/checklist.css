@@ -1,0 +1,859 @@
+/* ============================================================
+   checklist.css — 체크리스트 화면 전용 스타일
+
+   규칙
+   1. 색은 전부 tokens.css 의 변수에서 나온다. 하드코딩된 색상값은 없다.
+      배경 워시가 필요한 곳은 color-mix() 로 토큰에서 만들어 쓴다.
+      (--s1-wash 같은 파생 토큰은 계약에 없으므로 의존하지 않는다.)
+   2. 클래스는 전부 ck- 접두어. index.css 의 공용 .card/.pill/.tab 과
+      이름이 겹치면 다른 에이전트가 그쪽을 고칠 때 이 화면이 같이 흔들린다.
+   3. 대비: --warn 은 밝은 노랑이라 그대로 글자색으로 쓰면 라이트 테마에서 읽히지 않는다.
+      --ink 를 섞어 테마별로 알아서 어두워지거나 밝아지게 한다.
+   ============================================================ */
+
+.ck-app {
+  --ck-tap: 44px;
+  /* 상태색을 글자로 쓸 때의 보정판. 라이트에서는 어두워지고 다크에서는 밝아진다. */
+  --ck-crit-ink: color-mix(in srgb, var(--crit) 82%, var(--ink));
+  --ck-warn-ink: color-mix(in srgb, var(--warn) 66%, var(--ink));
+  --ck-good-ink: color-mix(in srgb, var(--good) 84%, var(--ink));
+
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 0 14px calc(40px + var(--safe-bottom, 0px));
+}
+
+.ck-app *,
+.ck-app *::before,
+.ck-app *::after {
+  box-sizing: border-box;
+}
+
+/* :where() 로 특정도를 0 으로 만든다. 그냥 `.ck-app button` 으로 쓰면 (0,1,1) 이라
+   뒤에 오는 `.ck-addbtn`(0,1,0) 의 color 를 이겨서 버튼 글자가 배경색에 묻힌다. */
+:where(.ck-app button) {
+  font-family: inherit;
+  color: inherit;
+  cursor: pointer;
+}
+
+.ck-app :focus-visible {
+  outline: 2px solid var(--s1);
+  outline-offset: 2px;
+  border-radius: 8px;
+}
+
+/* ── 헤더 ────────────────────────────────────────────── */
+
+.ck-hero {
+  position: relative;
+  padding: calc(22px + var(--safe-top, 0px)) 0 16px;
+  border-bottom: 1px solid var(--hair);
+  margin-bottom: 0;
+}
+
+.ck-hero__eyebrow {
+  font-size: 11px;
+  letter-spacing: .16em;
+  color: var(--muted);
+  text-transform: uppercase;
+  font-weight: 600;
+}
+
+.ck-hero__title {
+  font-size: 22px;
+  font-weight: 700;
+  margin: 7px 0 8px;
+}
+
+.ck-hero__dday {
+  display: flex;
+  align-items: baseline;
+  gap: 9px;
+  flex-wrap: wrap;
+}
+
+.ck-hero__dday b {
+  font-size: 27px;
+  font-weight: 700;
+  letter-spacing: -.03em;
+  font-variant-numeric: tabular-nums;
+  color: var(--s1);
+}
+
+.ck-hero__dday span {
+  font-size: 13px;
+  color: var(--ink-2);
+}
+
+.ck-hero__who {
+  margin-top: 6px;
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.ck-ghostbtn {
+  position: absolute;
+  top: calc(14px + var(--safe-top, 0px));
+  right: 0;
+  min-height: var(--ck-tap);
+  background: var(--surface);
+  border: 1px solid var(--hair);
+  color: var(--ink-2);
+  border-radius: 999px;
+  padding: 7px 13px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+/* ── 스티키 탭 / 칩 줄 ─────────────────────────────────── */
+
+.ck-sticky {
+  position: sticky;
+  top: 0;
+  z-index: 30;
+  background: var(--plane);
+  border-bottom: 1px solid var(--hair);
+  margin: 0 -14px 14px;
+  padding: 7px 0;
+}
+
+/* 칩 줄은 항상 화면 폭을 꽉 채워 좌우로 흐르게 둔다(잘린 칩이 스크롤 가능함을 알린다).
+   .ck-app 의 좌우 패딩을 음수 마진으로 상쇄하고 같은 값을 안쪽 패딩으로 되돌린다. */
+.ck-chiprow {
+  display: flex;
+  gap: 6px;
+  overflow-x: auto;
+  margin: 0 -14px;
+  padding: 0 14px;
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* 스티키 컨테이너가 이미 음수 마진을 갖고 있으므로 안쪽에서는 상쇄하지 않는다. */
+.ck-sticky .ck-chiprow {
+  margin: 0;
+}
+
+.ck-chiprow::-webkit-scrollbar {
+  display: none;
+}
+
+.ck-chip {
+  flex: 0 0 auto;
+  min-height: var(--ck-tap);
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border: 1px solid var(--hair);
+  background: var(--surface);
+  color: var(--ink-2);
+  border-radius: 999px;
+  padding: 0 14px;
+  font-size: 13px;
+  font-weight: 600;
+  white-space: nowrap;
+  transition: background .15s, color .15s, border-color .15s;
+}
+
+.ck-chip[aria-pressed='true'],
+.ck-chip[aria-selected='true'] {
+  background: var(--ink);
+  color: var(--surface);
+  border-color: var(--ink);
+}
+
+.ck-chip__count {
+  font-size: 11px;
+  font-weight: 700;
+  opacity: .65;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ── 카드 ────────────────────────────────────────────── */
+
+.ck-card {
+  background: var(--surface);
+  border: 1px solid var(--hair);
+  border-radius: var(--radius);
+  padding: 15px;
+  margin: 0 0 12px;
+}
+
+.ck-card__head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.ck-card__title {
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.ck-card__sub {
+  font-size: 12px;
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+
+/* ── 진행률 미터 ──────────────────────────────────────── */
+
+.ck-meter__top {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 8px;
+  font-size: 13px;
+  margin-bottom: 6px;
+}
+
+.ck-meter__top b {
+  font-weight: 600;
+}
+
+.ck-meter__top span {
+  font-variant-numeric: tabular-nums;
+  color: var(--ink-2);
+  font-weight: 700;
+}
+
+.ck-track {
+  height: 9px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--s1) 12%, transparent);
+  overflow: hidden;
+}
+
+.ck-fill {
+  height: 100%;
+  border-radius: 999px;
+  background: var(--s1);
+  transition: width .35s cubic-bezier(.2, .7, .3, 1);
+}
+
+.ck-fill--done {
+  background: var(--good);
+}
+
+.ck-track--mini {
+  height: 5px;
+}
+
+/* ── 경고 배너 ────────────────────────────────────────── */
+
+.ck-callout {
+  border-left: 3px solid var(--s1);
+  background: color-mix(in srgb, var(--s1) 9%, transparent);
+  padding: 11px 13px;
+  border-radius: 0 10px 10px 0;
+  font-size: 13px;
+  margin: 11px 0 0;
+  color: var(--ink-2);
+}
+
+.ck-callout b {
+  color: var(--ink);
+  font-weight: 700;
+}
+
+.ck-callout--crit {
+  border-color: var(--crit);
+  background: color-mix(in srgb, var(--crit) 10%, transparent);
+}
+
+.ck-callout--warn {
+  border-color: var(--warn);
+  background: color-mix(in srgb, var(--warn) 13%, transparent);
+}
+
+/* ── 컨트롤 줄 ────────────────────────────────────────── */
+
+.ck-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  align-items: center;
+  margin: 0 0 12px;
+}
+
+.ck-controls > .ck-chiprow {
+  flex: 1 1 100%;
+  min-width: 0;
+}
+
+.ck-controls__spacer {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.ck-addbtn {
+  min-height: var(--ck-tap);
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border: 1px solid var(--ink);
+  background: var(--ink);
+  color: var(--surface);
+  border-radius: 999px;
+  padding: 0 16px;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.ck-addbtn:disabled {
+  opacity: .5;
+  cursor: default;
+}
+
+.ck-grouphead {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 10px;
+  margin: 0 0 8px;
+}
+
+.ck-grouphead h3 {
+  font-size: 15px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.ck-grouphead__count {
+  font-size: 12px;
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+/* ── 목록 ────────────────────────────────────────────── */
+
+.ck-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  border: 1px solid var(--hair);
+  border-radius: var(--radius);
+  background: var(--surface);
+  overflow: hidden;
+}
+
+.ck-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 2px;
+  border-bottom: 1px solid var(--grid);
+  position: relative;
+  min-width: 0;
+}
+
+.ck-item:last-child {
+  border-bottom: 0;
+}
+
+/* 마감이 지났는데 아직 안 끝난 항목. 왼쪽 띠 + 옅은 바탕으로 목록에서 튀어나오게 한다. */
+.ck-item[data-tone='overdue'] {
+  background: color-mix(in srgb, var(--crit) 7%, transparent);
+}
+
+.ck-item[data-tone='overdue']::before,
+.ck-item[data-tone='today']::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 3px;
+  background: var(--crit);
+}
+
+.ck-item[data-tone='today'] {
+  background: color-mix(in srgb, var(--s2) 7%, transparent);
+}
+
+.ck-item[data-tone='today']::before {
+  background: var(--s2);
+}
+
+.ck-item[data-tone='done'] .ck-item__title {
+  color: var(--muted);
+  text-decoration: line-through;
+  text-decoration-color: color-mix(in srgb, var(--muted) 60%, transparent);
+}
+
+.ck-check {
+  flex: 0 0 auto;
+  width: var(--ck-tap);
+  min-height: var(--ck-tap);
+  align-self: stretch;
+  display: grid;
+  place-items: center;
+  background: none;
+  border: 0;
+  padding: 0;
+}
+
+.ck-check__box {
+  width: 22px;
+  height: 22px;
+  border-radius: 7px;
+  border: 1.5px solid color-mix(in srgb, var(--ink) 32%, transparent);
+  display: grid;
+  place-items: center;
+  transition: background .12s, border-color .12s;
+}
+
+.ck-check[aria-checked='true'] .ck-check__box {
+  background: var(--good);
+  border-color: var(--good);
+}
+
+.ck-check__box svg {
+  width: 13px;
+  height: 13px;
+  opacity: 0;
+  transition: opacity .12s;
+}
+
+.ck-check[aria-checked='true'] .ck-check__box svg {
+  opacity: 1;
+}
+
+.ck-item__body {
+  flex: 1 1 auto;
+  min-width: 0;
+  text-align: left;
+  background: none;
+  border: 0;
+  padding: 11px 12px 11px 2px;
+  min-height: var(--ck-tap);
+  display: block;
+}
+
+.ck-item__title {
+  display: block;
+  font-size: 14.5px;
+  font-weight: 600;
+  line-height: 1.45;
+  color: var(--ink);
+  overflow-wrap: anywhere;
+}
+
+.ck-item__meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  margin-top: 6px;
+}
+
+.ck-item__note {
+  display: block;
+  margin-top: 5px;
+  font-size: 12.5px;
+  color: var(--ink-2);
+  overflow-wrap: anywhere;
+}
+
+/* ── 뱃지 ────────────────────────────────────────────── */
+
+.ck-badge {
+  display: inline-block;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: 999px;
+  background: var(--surface-2);
+  color: var(--ink-2);
+  border: 1px solid transparent;
+  letter-spacing: 0;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+
+.ck-badge[data-tone='overdue'] {
+  background: color-mix(in srgb, var(--crit) 14%, transparent);
+  color: var(--ck-crit-ink);
+}
+
+.ck-badge[data-tone='today'] {
+  background: color-mix(in srgb, var(--s2) 15%, transparent);
+  color: var(--s2);
+}
+
+.ck-badge[data-tone='soon'] {
+  background: color-mix(in srgb, var(--warn) 18%, transparent);
+  color: var(--ck-warn-ink);
+}
+
+.ck-badge[data-tone='done'] {
+  background: color-mix(in srgb, var(--good) 12%, transparent);
+  color: var(--ck-good-ink);
+}
+
+.ck-badge--assignee {
+  background: color-mix(in srgb, var(--s1) 11%, transparent);
+  color: var(--s1);
+}
+
+/* ── 상태 화면 (로딩 / 에러 / 빈 목록) ───────────────────── */
+
+.ck-state {
+  text-align: left;
+  padding: 20px 16px;
+}
+
+.ck-state h3 {
+  font-size: 15px;
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+
+.ck-state p {
+  margin: 0 0 9px;
+  font-size: 13.5px;
+  color: var(--ink-2);
+}
+
+.ck-state p:last-child {
+  margin-bottom: 0;
+}
+
+.ck-state ul {
+  margin: 0 0 10px;
+  padding-left: 18px;
+  font-size: 13.5px;
+  color: var(--ink-2);
+}
+
+.ck-state li {
+  margin: 0 0 6px;
+}
+
+.ck-state code {
+  font-size: 12px;
+  background: var(--surface-2);
+  border-radius: 5px;
+  padding: 1px 5px;
+  overflow-wrap: anywhere;
+}
+
+.ck-state__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.ck-errbox {
+  margin: 10px 0;
+  padding: 10px 12px;
+  border-radius: 10px;
+  background: var(--surface-2);
+  border: 1px solid var(--hair);
+  font-size: 12px;
+  color: var(--ink-2);
+  overflow-wrap: anywhere;
+}
+
+.ck-errbox dt {
+  font-weight: 700;
+  color: var(--muted);
+  font-size: 11px;
+}
+
+.ck-errbox dd {
+  margin: 0 0 6px;
+}
+
+.ck-errbox dd:last-child {
+  margin-bottom: 0;
+}
+
+.ck-skel {
+  height: 58px;
+  border-bottom: 1px solid var(--grid);
+  background: linear-gradient(90deg,
+      transparent 0%,
+      color-mix(in srgb, var(--ink) 4%, transparent) 50%,
+      transparent 100%);
+  background-size: 200% 100%;
+  animation: ck-shimmer 1.2s linear infinite;
+}
+
+.ck-skel:last-child {
+  border-bottom: 0;
+}
+
+@keyframes ck-shimmer {
+  from {
+    background-position: 200% 0;
+  }
+
+  to {
+    background-position: -200% 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ck-skel {
+    animation: none;
+  }
+
+  .ck-fill {
+    transition: none;
+  }
+}
+
+/* ── 하단 시트 (추가 / 편집) ───────────────────────────── */
+
+.ck-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  background: color-mix(in srgb, var(--ink) 42%, transparent);
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  padding: 0;
+}
+
+.ck-sheet {
+  width: 100%;
+  max-width: 720px;
+  max-height: 92vh;
+  overflow-y: auto;
+  background: var(--surface);
+  border: 1px solid var(--hair);
+  border-bottom: 0;
+  border-radius: var(--radius) var(--radius) 0 0;
+  padding: 16px 16px calc(18px + var(--safe-bottom, 0px));
+  animation: ck-rise .18s cubic-bezier(.2, .7, .3, 1);
+}
+
+@keyframes ck-rise {
+  from {
+    transform: translateY(14px);
+    opacity: 0;
+  }
+
+  to {
+    transform: none;
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ck-sheet {
+    animation: none;
+  }
+}
+
+@media (min-width: 560px) {
+  .ck-backdrop {
+    align-items: center;
+    padding: 20px 14px;
+  }
+
+  .ck-sheet {
+    border-radius: var(--radius);
+    border-bottom: 1px solid var(--hair);
+  }
+}
+
+.ck-sheet__head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+
+.ck-sheet__head h2 {
+  font-size: 17px;
+  font-weight: 700;
+}
+
+.ck-field {
+  margin: 0 0 12px;
+}
+
+.ck-field > label {
+  display: block;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--muted);
+  margin-bottom: 5px;
+}
+
+.ck-input,
+.ck-select,
+.ck-textarea {
+  width: 100%;
+  min-height: var(--ck-tap);
+  background: var(--plane);
+  border: 1px solid var(--hair);
+  border-radius: 10px;
+  color: var(--ink);
+  font-family: inherit;
+  /* 16px 미만이면 iOS 사파리가 포커스할 때 화면을 확대해 버린다.
+     본문이 15px 이라도 입력 필드만은 16px 를 유지한다. */
+  font-size: 16px;
+  padding: 10px 12px;
+}
+
+.ck-textarea {
+  min-height: 76px;
+  resize: vertical;
+  line-height: 1.55;
+}
+
+.ck-segment {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.ck-sheet__actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 16px;
+  padding-top: 14px;
+  border-top: 1px solid var(--grid);
+}
+
+.ck-btn {
+  min-height: var(--ck-tap);
+  border-radius: 10px;
+  padding: 0 16px;
+  font-size: 14px;
+  font-weight: 700;
+  border: 1px solid var(--hair);
+  background: var(--surface-2);
+  color: var(--ink-2);
+}
+
+.ck-btn--primary {
+  background: var(--ink);
+  border-color: var(--ink);
+  color: var(--surface);
+  flex: 1 1 auto;
+}
+
+.ck-btn--danger {
+  background: color-mix(in srgb, var(--crit) 12%, transparent);
+  border-color: color-mix(in srgb, var(--crit) 30%, transparent);
+  color: var(--ck-crit-ink);
+}
+
+.ck-btn:disabled {
+  opacity: .5;
+  cursor: default;
+}
+
+.ck-confirm {
+  margin-top: 14px;
+  padding: 12px 13px;
+  border-radius: 10px;
+  border: 1px solid color-mix(in srgb, var(--crit) 30%, transparent);
+  background: color-mix(in srgb, var(--crit) 8%, transparent);
+}
+
+.ck-confirm p {
+  margin: 0 0 10px;
+  font-size: 13.5px;
+  color: var(--ink);
+}
+
+.ck-confirm__row {
+  display: flex;
+  gap: 8px;
+}
+
+/* ── 토스트 (쓰기 실패 알림) ───────────────────────────── */
+
+.ck-toast {
+  position: fixed;
+  left: 50%;
+  transform: translateX(-50%);
+  /* AppShell 의 하단 네비(--sh-nav-total = 58px + safe-bottom) 위로 띄운다.
+     z-index 가 70 이라 네비(50)보다 앞에 그려지므로, 여백 없이 두면 토스트가 떠 있는
+     동안 네비 버튼이 눌리지 않는다. 셸 없이 단독으로 쓸 때를 위해 폴백을 둔다. */
+  bottom: calc(var(--sh-nav-total, var(--safe-bottom, 0px)) + 12px);
+  z-index: 70;
+  max-width: min(92vw, 540px);
+  background: var(--ink);
+  color: var(--plane);
+  border-radius: 12px;
+  padding: 11px 14px;
+  font-size: 13px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  box-shadow: 0 8px 26px color-mix(in srgb, var(--ink) 28%, transparent);
+}
+
+.ck-toast button {
+  background: none;
+  border: 0;
+  color: inherit;
+  font-size: 12px;
+  font-weight: 700;
+  opacity: .75;
+  padding: 4px;
+}
+
+/* ── 연결 상태 표시 ───────────────────────────────────── */
+
+.ck-live {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--muted);
+  white-space: nowrap;
+}
+
+.ck-live__dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 999px;
+  background: var(--muted);
+}
+
+.ck-live[data-state='live'] .ck-live__dot {
+  background: var(--good);
+}
+
+.ck-live[data-state='offline'] .ck-live__dot {
+  background: var(--crit);
+}
+
+.ck-footnote {
+  margin: 22px 0 0;
+  padding-top: 14px;
+  border-top: 1px solid var(--hair);
+  font-size: 11.5px;
+  color: var(--muted);
+  line-height: 1.7;
+}
+
+.ck-sr {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}

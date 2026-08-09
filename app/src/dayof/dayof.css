@@ -1,0 +1,1172 @@
+/* ============================================================
+   dayof.css — 본식 당일 화면 전용 스타일
+
+   규칙
+   1. 색은 전부 tokens.css 의 변수에서 나온다. 하드코딩된 색상값은 없다.
+      배경 워시가 필요한 곳은 color-mix() 로 토큰에서 만들어 쓴다.
+      (--s1-wash 같은 파생 토큰은 계약에 없으므로 의존하지 않는다.)
+   2. 클래스는 전부 dof- 접두어. index.css 의 공용 .card/.pill/.tab 이나
+      체크리스트의 ck- 와 겹치지 않게 한다. 이름이 겹치면 다른 에이전트가
+      그쪽을 고칠 때 이 화면이 같이 흔들린다.
+   3. 하단 고정 요소를 만들지 않는다. 셸이 56px + safe-area 네비게이션을 깐다.
+      대신 .dof-app 하단에 그만큼 여백을 준다.
+   4. 터치 타겟 최소 44px(--dof-tap). 입력은 16px 이상(iOS 확대 방지).
+   ============================================================ */
+
+.dof-app {
+  --dof-tap: 44px;
+  /* 셸이 까는 하단 고정 네비게이션 높이. 콘텐츠가 그 아래로 숨지 않게 한다.
+     이 화면만 따로 띄워도 안전하도록 기본값을 갖고 있다.
+
+     ※ 통합 시: 셸의 콘텐츠 래퍼(.sh-main)가 이미 네비 높이만큼 여백을 갖고 있다면
+       여백이 두 번 잡힌다. 그때는 이 한 줄만 덮으면 된다.
+         .sh-main .dof-app { --dof-navbar: 0px; } */
+  --dof-navbar: 56px;
+  /* 상태색을 글자로 쓸 때의 보정판. 라이트에서는 어두워지고 다크에서는 밝아진다. */
+  --dof-crit-ink: color-mix(in srgb, var(--crit) 82%, var(--ink));
+  --dof-warn-ink: color-mix(in srgb, var(--warn) 66%, var(--ink));
+  --dof-good-ink: color-mix(in srgb, var(--good) 84%, var(--ink));
+
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 0 14px calc(16px + var(--dof-navbar) + var(--safe-bottom, 0px));
+}
+
+.dof-app *,
+.dof-app *::before,
+.dof-app *::after {
+  box-sizing: border-box;
+}
+
+/* :where() 로 특정도를 0 으로 만든다. 그냥 `.dof-app button` 으로 쓰면 (0,1,1) 이라
+   뒤에 오는 `.dof-addbtn`(0,1,0) 의 color 를 이겨서 버튼 글자가 배경색에 묻힌다. */
+:where(.dof-app button) {
+  font-family: inherit;
+  color: inherit;
+  cursor: pointer;
+}
+
+.dof-app :focus-visible,
+.dof-backdrop :focus-visible {
+  outline: 2px solid var(--s1);
+  outline-offset: 2px;
+  border-radius: 8px;
+}
+
+/* ── 헤더 ────────────────────────────────────────────── */
+
+.dof-hero {
+  padding: calc(20px + var(--safe-top, 0px)) 0 14px;
+  border-bottom: 1px solid var(--hair);
+}
+
+.dof-hero__row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.dof-hero__eyebrow {
+  font-size: 11px;
+  letter-spacing: .16em;
+  color: var(--muted);
+  text-transform: uppercase;
+  font-weight: 600;
+}
+
+.dof-hero__title {
+  font-size: 22px;
+  font-weight: 700;
+  margin: 6px 0 0;
+}
+
+.dof-hero__when {
+  display: flex;
+  align-items: baseline;
+  gap: 9px;
+  flex-wrap: wrap;
+  margin-top: 10px;
+}
+
+.dof-hero__when b {
+  font-size: 30px;
+  font-weight: 700;
+  letter-spacing: -.03em;
+  font-variant-numeric: tabular-nums;
+  color: var(--s1);
+}
+
+.dof-hero__when span {
+  font-size: 13px;
+  color: var(--ink-2);
+}
+
+/* ── 섹션 전환 ───────────────────────────────────────── */
+
+.dof-sticky {
+  position: sticky;
+  top: 0;
+  z-index: 30;
+  background: var(--plane);
+  border-bottom: 1px solid var(--hair);
+  margin: 0 -14px 14px;
+  padding: 7px 0;
+}
+
+/* 칩 줄은 화면 폭을 꽉 채워 좌우로 흐르게 둔다(잘린 칩이 스크롤 가능함을 알린다). */
+.dof-chiprow {
+  display: flex;
+  gap: 6px;
+  overflow-x: auto;
+  padding: 0 14px;
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+}
+
+.dof-chiprow::-webkit-scrollbar {
+  display: none;
+}
+
+.dof-chip {
+  flex: 0 0 auto;
+  min-height: var(--dof-tap);
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border: 1px solid var(--hair);
+  background: var(--surface);
+  color: var(--ink-2);
+  border-radius: 999px;
+  padding: 0 15px;
+  font-size: 13.5px;
+  font-weight: 600;
+  white-space: nowrap;
+  transition: background .15s, color .15s, border-color .15s;
+}
+
+.dof-chip[aria-pressed='true'],
+.dof-chip[aria-selected='true'] {
+  background: var(--ink);
+  color: var(--surface);
+  border-color: var(--ink);
+}
+
+.dof-chip__count {
+  font-size: 11px;
+  font-weight: 700;
+  opacity: .65;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ── 카드 ────────────────────────────────────────────── */
+
+.dof-card {
+  background: var(--surface);
+  border: 1px solid var(--hair);
+  border-radius: var(--radius);
+  padding: 15px;
+  margin: 0 0 12px;
+}
+
+.dof-hint {
+  margin: 10px 0 0;
+  font-size: 12.5px;
+  color: var(--muted);
+  line-height: 1.6;
+}
+
+/* ── 기준 시각 카드 ──────────────────────────────────── */
+
+.dof-base {
+  border-left: 3px solid var(--s1);
+}
+
+.dof-base__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.dof-base__eyebrow {
+  font-size: 11.5px;
+  font-weight: 700;
+  color: var(--muted);
+  letter-spacing: .04em;
+}
+
+.dof-base__clock {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-top: 8px;
+}
+
+.dof-base__clock b {
+  font-size: 34px;
+  font-weight: 700;
+  letter-spacing: -.04em;
+  font-variant-numeric: tabular-nums;
+  line-height: 1.1;
+}
+
+.dof-base__clock span {
+  font-size: 13.5px;
+  color: var(--ink-2);
+}
+
+.dof-base__hall {
+  margin: 8px 0 0;
+  font-size: 13px;
+  color: var(--ink-2);
+  overflow-wrap: anywhere;
+}
+
+.dof-base__facts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 9px;
+}
+
+.dof-base__note {
+  margin: 10px 0 0;
+  font-size: 12.5px;
+  color: var(--muted);
+  line-height: 1.65;
+  overflow-wrap: anywhere;
+}
+
+/* ── 사례비 합계 ─────────────────────────────────────── */
+
+.dof-fees__eyebrow {
+  display: block;
+  font-size: 11.5px;
+  font-weight: 700;
+  color: var(--muted);
+  letter-spacing: .04em;
+}
+
+.dof-fees__amount {
+  display: block;
+  margin-top: 4px;
+  font-size: 32px;
+  font-weight: 700;
+  letter-spacing: -.03em;
+  font-variant-numeric: tabular-nums;
+  line-height: 1.15;
+}
+
+.dof-fees__amount i {
+  font-style: normal;
+  font-size: 16px;
+  font-weight: 600;
+  margin-left: 3px;
+  color: var(--ink-2);
+}
+
+.dof-fees__split {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 18px;
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid var(--grid);
+}
+
+.dof-fees__split > div {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.dof-fees__split span {
+  font-size: 11.5px;
+  color: var(--muted);
+  font-weight: 600;
+}
+
+.dof-fees__split b {
+  font-size: 14.5px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ── 진행률 미터 ─────────────────────────────────────── */
+
+.dof-meter__top {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 8px;
+  font-size: 13px;
+  margin-bottom: 6px;
+}
+
+.dof-meter__top b {
+  font-weight: 600;
+}
+
+.dof-meter__top span {
+  font-variant-numeric: tabular-nums;
+  color: var(--ink-2);
+  font-weight: 700;
+}
+
+.dof-track {
+  height: 9px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--s1) 12%, transparent);
+  overflow: hidden;
+}
+
+.dof-track--mini {
+  height: 5px;
+}
+
+.dof-fill {
+  height: 100%;
+  border-radius: 999px;
+  background: var(--s1);
+  transition: width .35s cubic-bezier(.2, .7, .3, 1);
+}
+
+.dof-fill--done {
+  background: var(--good);
+}
+
+/* ── 안내 배너 ───────────────────────────────────────── */
+
+.dof-callout {
+  border-left: 3px solid var(--s1);
+  background: color-mix(in srgb, var(--s1) 9%, transparent);
+  padding: 11px 13px;
+  border-radius: 0 10px 10px 0;
+  font-size: 13px;
+  line-height: 1.65;
+  margin: 11px 0 0;
+  color: var(--ink-2);
+  overflow-wrap: anywhere;
+}
+
+.dof-callout b {
+  color: var(--ink);
+  font-weight: 700;
+}
+
+.dof-callout--crit {
+  border-color: var(--crit);
+  background: color-mix(in srgb, var(--crit) 10%, transparent);
+}
+
+.dof-callout--warn {
+  border-color: var(--warn);
+  background: color-mix(in srgb, var(--warn) 13%, transparent);
+}
+
+.dof-callout code {
+  font-size: 12px;
+  background: var(--surface-2);
+  border-radius: 5px;
+  padding: 1px 5px;
+  overflow-wrap: anywhere;
+}
+
+/* ── 컨트롤 줄 ───────────────────────────────────────── */
+
+.dof-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  margin: 0 0 12px;
+}
+
+.dof-controls__label {
+  font-size: 12.5px;
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+}
+
+.dof-controls__spacer {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.dof-addbtn {
+  min-height: var(--dof-tap);
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border: 1px solid var(--ink);
+  background: var(--ink);
+  color: var(--surface);
+  border-radius: 999px;
+  padding: 0 17px;
+  font-size: 13.5px;
+  font-weight: 700;
+}
+
+.dof-addbtn:disabled {
+  opacity: .5;
+  cursor: default;
+}
+
+/* ── 그룹 머리 ───────────────────────────────────────── */
+
+.dof-group {
+  margin: 0 0 18px;
+}
+
+.dof-grouphead {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 10px;
+  margin: 0 0 8px;
+}
+
+.dof-grouphead h3 {
+  font-size: 15px;
+  font-weight: 700;
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  flex-wrap: wrap;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.dof-grouphead__range {
+  font-size: 11.5px;
+  font-weight: 600;
+  color: var(--muted);
+}
+
+.dof-grouphead__count {
+  font-size: 12px;
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.dof-grouphead__meter {
+  margin-bottom: 8px;
+}
+
+/* ── 목록 ────────────────────────────────────────────── */
+
+.dof-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  border: 1px solid var(--hair);
+  border-radius: var(--radius);
+  background: var(--surface);
+  overflow: hidden;
+}
+
+.dof-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 2px;
+  border-bottom: 1px solid var(--grid);
+  position: relative;
+  min-width: 0;
+}
+
+.dof-item:last-child {
+  border-bottom: 0;
+}
+
+/* 예식 시작(offset 0) 항목. 진행표의 원점이라 왼쪽 띠로 눈에 띄게 한다. */
+.dof-item[data-tone='anchor'] {
+  background: color-mix(in srgb, var(--s1) 8%, transparent);
+}
+
+.dof-item[data-tone='anchor']::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 3px;
+  background: var(--s1);
+}
+
+/* 아직 사람이 정해지지 않은 역할. 남은 일이 한눈에 보여야 한다. */
+.dof-item[data-tone='undecided'] {
+  background: color-mix(in srgb, var(--warn) 9%, transparent);
+}
+
+.dof-item[data-tone='undecided']::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 3px;
+  background: var(--warn);
+}
+
+.dof-item[data-tone='done'] .dof-item__title {
+  color: var(--muted);
+  text-decoration: line-through;
+  text-decoration-color: color-mix(in srgb, var(--muted) 60%, transparent);
+}
+
+.dof-item[data-tone='done'] .dof-item__time b {
+  color: var(--muted);
+}
+
+/* ── 예식 시작 기준선 ────────────────────────────────── */
+
+.dof-anchor {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 12px;
+  background: var(--surface-2);
+  border-bottom: 1px solid var(--grid);
+}
+
+.dof-anchor::before,
+.dof-anchor::after {
+  content: '';
+  flex: 1 1 auto;
+  height: 2px;
+  background: var(--s1);
+  border-radius: 999px;
+}
+
+.dof-anchor span {
+  flex: 0 0 auto;
+  font-size: 11.5px;
+  font-weight: 700;
+  letter-spacing: .04em;
+  color: var(--s1);
+  font-variant-numeric: tabular-nums;
+}
+
+/* ── 체크 / 본문 / 통화 버튼 ─────────────────────────── */
+
+.dof-check {
+  flex: 0 0 auto;
+  width: var(--dof-tap);
+  min-height: var(--dof-tap);
+  align-self: stretch;
+  display: grid;
+  place-items: center;
+  background: none;
+  border: 0;
+  padding: 0;
+}
+
+.dof-check__box {
+  width: 24px;
+  height: 24px;
+  border-radius: 8px;
+  border: 1.5px solid color-mix(in srgb, var(--ink) 32%, transparent);
+  display: grid;
+  place-items: center;
+  transition: background .12s, border-color .12s;
+}
+
+.dof-check[aria-checked='true'] .dof-check__box {
+  background: var(--good);
+  border-color: var(--good);
+}
+
+.dof-check__box svg {
+  width: 14px;
+  height: 14px;
+  opacity: 0;
+  transition: opacity .12s;
+}
+
+.dof-check[aria-checked='true'] .dof-check__box svg {
+  opacity: 1;
+}
+
+.dof-item__body {
+  flex: 1 1 auto;
+  min-width: 0;
+  text-align: left;
+  background: none;
+  border: 0;
+  padding: 11px 10px 11px 2px;
+  min-height: var(--dof-tap);
+  display: block;
+}
+
+/* 진행표 행만 [시각 | 내용] 두 칸이다. 역할·준비물 행은 시각 칸이 없다. */
+.dof-item--schedule .dof-item__body {
+  display: flex;
+  gap: 11px;
+  align-items: flex-start;
+}
+
+/* ★ 당일 현장에서 시계처럼 보는 값. 목록에서 가장 큰 글자다. */
+.dof-item__time {
+  flex: 0 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  min-width: 58px;
+  padding-top: 1px;
+}
+
+.dof-item__time b {
+  font-size: 19px;
+  font-weight: 700;
+  letter-spacing: -.03em;
+  font-variant-numeric: tabular-nums;
+  line-height: 1.2;
+  color: var(--ink);
+}
+
+.dof-item__time i {
+  font-style: normal;
+  font-size: 11px;
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.dof-item__main {
+  flex: 1 1 auto;
+  min-width: 0;
+  display: block;
+}
+
+.dof-item__title {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  flex-wrap: wrap;
+  font-size: 14.5px;
+  font-weight: 600;
+  line-height: 1.45;
+  color: var(--ink);
+  overflow-wrap: anywhere;
+}
+
+.dof-item__meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  margin-top: 6px;
+}
+
+.dof-item__note {
+  display: block;
+  margin-top: 5px;
+  font-size: 12.5px;
+  color: var(--ink-2);
+  line-height: 1.6;
+  overflow-wrap: anywhere;
+}
+
+/* 당일 가장 많이 쓰는 버튼. 연락처가 없으면 자리만 남기고 흐려 둔다. */
+.dof-call {
+  flex: 0 0 auto;
+  width: var(--dof-tap);
+  min-height: var(--dof-tap);
+  align-self: stretch;
+  display: grid;
+  place-items: center;
+  color: var(--s1);
+  text-decoration: none;
+  border-left: 1px solid var(--grid);
+}
+
+.dof-call--off {
+  color: var(--muted);
+  opacity: .32;
+}
+
+.dof-edit {
+  flex: 0 0 auto;
+  width: var(--dof-tap);
+  min-height: var(--dof-tap);
+  align-self: stretch;
+  display: grid;
+  place-items: center;
+  background: none;
+  border: 0;
+  border-left: 1px solid var(--grid);
+  color: var(--muted);
+  font-size: 17px;
+  line-height: 1;
+  padding: 0;
+}
+
+/* ── 뱃지 ────────────────────────────────────────────── */
+
+.dof-badge {
+  display: inline-block;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: 999px;
+  background: var(--surface-2);
+  color: var(--ink-2);
+  border: 1px solid transparent;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+
+.dof-badge--offset {
+  background: color-mix(in srgb, var(--s1) 11%, transparent);
+  color: var(--s1);
+}
+
+.dof-badge--role {
+  background: color-mix(in srgb, var(--s2) 12%, transparent);
+  color: var(--s2);
+}
+
+.dof-badge--person {
+  background: color-mix(in srgb, var(--s1) 11%, transparent);
+  color: var(--s1);
+}
+
+.dof-badge--side {
+  font-size: 10.5px;
+  background: var(--surface-2);
+  color: var(--muted);
+}
+
+.dof-badge--undecided {
+  background: color-mix(in srgb, var(--warn) 20%, transparent);
+  color: var(--dof-warn-ink);
+}
+
+.dof-badge--ok {
+  background: color-mix(in srgb, var(--good) 13%, transparent);
+  color: var(--dof-good-ink);
+}
+
+.dof-badge--fee {
+  background: color-mix(in srgb, var(--ink) 7%, transparent);
+  color: var(--ink);
+}
+
+.dof-badge--pending {
+  background: color-mix(in srgb, var(--muted) 18%, transparent);
+  color: var(--muted);
+}
+
+/* ── 상태 화면 (로딩 / 에러 / 빈 목록) ───────────────── */
+
+.dof-state {
+  text-align: left;
+  padding: 18px 16px;
+}
+
+.dof-state h3 {
+  font-size: 15px;
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+
+.dof-state p {
+  margin: 0 0 9px;
+  font-size: 13.5px;
+  color: var(--ink-2);
+  line-height: 1.65;
+}
+
+.dof-state p:last-child {
+  margin-bottom: 0;
+}
+
+.dof-state ul {
+  margin: 0 0 10px;
+  padding-left: 18px;
+  font-size: 13.5px;
+  color: var(--ink-2);
+}
+
+.dof-state li {
+  margin: 0 0 6px;
+  line-height: 1.6;
+}
+
+.dof-state code {
+  font-size: 12px;
+  background: var(--surface-2);
+  border-radius: 5px;
+  padding: 1px 5px;
+  overflow-wrap: anywhere;
+}
+
+.dof-state__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.dof-errbox {
+  margin: 10px 0;
+  padding: 10px 12px;
+  border-radius: 10px;
+  background: var(--surface-2);
+  border: 1px solid var(--hair);
+  font-size: 12px;
+  color: var(--ink-2);
+  overflow-wrap: anywhere;
+}
+
+.dof-errbox dt {
+  font-weight: 700;
+  color: var(--muted);
+  font-size: 11px;
+}
+
+.dof-errbox dd {
+  margin: 0 0 6px;
+}
+
+.dof-errbox dd:last-child {
+  margin-bottom: 0;
+}
+
+.dof-skel {
+  height: 62px;
+  border-bottom: 1px solid var(--grid);
+  background: linear-gradient(90deg,
+      transparent 0%,
+      color-mix(in srgb, var(--ink) 4%, transparent) 50%,
+      transparent 100%);
+  background-size: 200% 100%;
+  animation: dof-shimmer 1.2s linear infinite;
+}
+
+.dof-skel:last-child {
+  border-bottom: 0;
+}
+
+@keyframes dof-shimmer {
+  from {
+    background-position: 200% 0;
+  }
+
+  to {
+    background-position: -200% 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .dof-skel {
+    animation: none;
+  }
+
+  .dof-fill {
+    transition: none;
+  }
+}
+
+/* ── 하단 시트 ───────────────────────────────────────── */
+
+/* z-index 를 크게 잡는 이유: 셸의 하단 고정 네비게이션(56px)이 이 화면 밖에 있고,
+   그 위를 덮지 못하면 시트 아래쪽의 저장·삭제 버튼이 가려진다. */
+.dof-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  background: color-mix(in srgb, var(--ink) 44%, transparent);
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+}
+
+.dof-sheet {
+  width: 100%;
+  max-width: 720px;
+  max-height: 92vh;
+  overflow-y: auto;
+  background: var(--surface);
+  border: 1px solid var(--hair);
+  border-bottom: 0;
+  border-radius: var(--radius) var(--radius) 0 0;
+  padding: 16px 16px calc(20px + var(--safe-bottom, 0px));
+  animation: dof-rise .18s cubic-bezier(.2, .7, .3, 1);
+}
+
+@keyframes dof-rise {
+  from {
+    transform: translateY(14px);
+    opacity: 0;
+  }
+
+  to {
+    transform: none;
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .dof-sheet {
+    animation: none;
+  }
+}
+
+@media (min-width: 560px) {
+  .dof-backdrop {
+    align-items: center;
+    padding: 20px 14px;
+  }
+
+  .dof-sheet {
+    border-radius: var(--radius);
+    border-bottom: 1px solid var(--hair);
+  }
+}
+
+.dof-sheet__head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+
+.dof-sheet__head h2 {
+  font-size: 17px;
+  font-weight: 700;
+}
+
+.dof-sheet__actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 16px;
+  padding-top: 14px;
+  border-top: 1px solid var(--grid);
+}
+
+/* ── 폼 ──────────────────────────────────────────────── */
+
+.dof-field {
+  margin: 0 0 13px;
+}
+
+.dof-field > label {
+  display: block;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--muted);
+  margin-bottom: 5px;
+}
+
+.dof-field__hint {
+  margin: 5px 0 0;
+  font-size: 11.5px;
+  color: var(--muted);
+  line-height: 1.6;
+}
+
+.dof-input,
+.dof-select,
+.dof-textarea {
+  width: 100%;
+  min-height: var(--dof-tap);
+  background: var(--plane);
+  border: 1px solid var(--hair);
+  border-radius: 10px;
+  color: var(--ink);
+  font-family: inherit;
+  /* 16px 미만이면 iOS 사파리가 포커스할 때 화면을 확대해 버린다.
+     본문이 15px 이라도 입력 필드만은 16px 를 유지한다. */
+  font-size: 16px;
+  padding: 10px 12px;
+}
+
+.dof-textarea {
+  min-height: 78px;
+  resize: vertical;
+  line-height: 1.55;
+}
+
+.dof-segment {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.dof-row2 {
+  display: flex;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.dof-row2__cell {
+  flex: 1 1 0;
+  min-width: 0;
+  display: block;
+}
+
+.dof-row2__cell > span {
+  display: block;
+  font-size: 11.5px;
+  font-weight: 600;
+  color: var(--muted);
+  margin-bottom: 4px;
+}
+
+/* 입력한 상대 분을 사람 말로 되짚어 준다. -240 을 눈으로 검산하기는 어렵다. */
+.dof-echo {
+  margin: 8px 0 0;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--s1);
+}
+
+.dof-echo code {
+  font-size: 12px;
+  background: var(--surface-2);
+  border-radius: 5px;
+  padding: 1px 5px;
+  color: var(--ink-2);
+}
+
+.dof-btn {
+  min-height: var(--dof-tap);
+  border-radius: 10px;
+  padding: 0 16px;
+  font-size: 14px;
+  font-weight: 700;
+  border: 1px solid var(--hair);
+  background: var(--surface-2);
+  color: var(--ink-2);
+}
+
+.dof-btn--primary {
+  background: var(--ink);
+  border-color: var(--ink);
+  color: var(--surface);
+  flex: 1 1 auto;
+}
+
+.dof-btn--danger {
+  background: color-mix(in srgb, var(--crit) 12%, transparent);
+  border-color: color-mix(in srgb, var(--crit) 30%, transparent);
+  color: var(--dof-crit-ink);
+}
+
+.dof-btn--quiet {
+  background: transparent;
+  border-color: var(--hair);
+  font-size: 12.5px;
+  padding: 0 13px;
+}
+
+.dof-btn:disabled {
+  opacity: .5;
+  cursor: default;
+}
+
+.dof-confirm {
+  margin-top: 14px;
+  padding: 12px 13px;
+  border-radius: 10px;
+  border: 1px solid var(--hair);
+  background: var(--surface-2);
+}
+
+.dof-confirm--danger {
+  border-color: color-mix(in srgb, var(--crit) 30%, transparent);
+  background: color-mix(in srgb, var(--crit) 8%, transparent);
+}
+
+.dof-confirm p {
+  margin: 0 0 10px;
+  font-size: 13.5px;
+  color: var(--ink);
+  line-height: 1.6;
+}
+
+.dof-confirm__row {
+  display: flex;
+  gap: 8px;
+}
+
+/* ── 토스트 ──────────────────────────────────────────── */
+
+/* 하단에는 셸의 고정 네비게이션이 깔린다. 토스트를 아래에 두면 그 위에 겹치거나
+   그 아래에 숨는다. 그래서 상단에 띄운다. */
+.dof-toast {
+  position: fixed;
+  left: 50%;
+  transform: translateX(-50%);
+  top: calc(10px + var(--safe-top, 0px));
+  z-index: 210;
+  max-width: min(92vw, 540px);
+  background: var(--ink);
+  color: var(--plane);
+  border-radius: 12px;
+  padding: 11px 14px;
+  font-size: 13px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  box-shadow: 0 8px 26px color-mix(in srgb, var(--ink) 28%, transparent);
+}
+
+.dof-toast button {
+  background: none;
+  border: 0;
+  color: inherit;
+  font-size: 12px;
+  font-weight: 700;
+  opacity: .75;
+  padding: 4px;
+  cursor: pointer;
+  font-family: inherit;
+}
+
+/* ── 연결 상태 ───────────────────────────────────────── */
+
+.dof-live {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--muted);
+  white-space: nowrap;
+  flex: 0 0 auto;
+}
+
+.dof-live__dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 999px;
+  background: var(--muted);
+}
+
+.dof-live[data-state='live'] .dof-live__dot {
+  background: var(--good);
+}
+
+.dof-live[data-state='offline'] .dof-live__dot {
+  background: var(--crit);
+}
+
+.dof-footnote {
+  margin: 22px 0 0;
+  padding-top: 14px;
+  border-top: 1px solid var(--hair);
+  font-size: 11.5px;
+  color: var(--muted);
+  line-height: 1.75;
+}
+
+.dof-footnote b {
+  color: var(--ink-2);
+}

@@ -101,6 +101,170 @@ export type Database = {
           },
         ]
       }
+      day_of_config: {
+        Row: {
+          banquet_from_offset_min: number
+          banquet_to_offset_min: number
+          ceremony_at: string
+          guarantee_count: number | null
+          hall: string | null
+          id: number
+          note: string | null
+          updated_at: string
+        }
+        Insert: {
+          banquet_from_offset_min?: number
+          banquet_to_offset_min?: number
+          ceremony_at: string
+          guarantee_count?: number | null
+          hall?: string | null
+          id?: number
+          note?: string | null
+          updated_at?: string
+        }
+        Update: {
+          banquet_from_offset_min?: number
+          banquet_to_offset_min?: number
+          ceremony_at?: string
+          guarantee_count?: number | null
+          hall?: string | null
+          id?: number
+          note?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      day_of_events: {
+        Row: {
+          created_at: string
+          duration_min: number | null
+          id: string
+          location: string | null
+          note: string | null
+          offset_min: number
+          phase: Database["public"]["Enums"]["day_of_phase"]
+          role_id: string | null
+          sort_order: number
+          status: Database["public"]["Enums"]["task_status"]
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          duration_min?: number | null
+          id?: string
+          location?: string | null
+          note?: string | null
+          offset_min: number
+          phase: Database["public"]["Enums"]["day_of_phase"]
+          role_id?: string | null
+          sort_order?: number
+          status?: Database["public"]["Enums"]["task_status"]
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          duration_min?: number | null
+          id?: string
+          location?: string | null
+          note?: string | null
+          offset_min?: number
+          phase?: Database["public"]["Enums"]["day_of_phase"]
+          role_id?: string | null
+          sort_order?: number
+          status?: Database["public"]["Enums"]["task_status"]
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "day_of_events_role_id_fkey"
+            columns: ["role_id"]
+            isOneToOne: false
+            referencedRelation: "day_of_roles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      day_of_items: {
+        Row: {
+          category: string
+          created_at: string
+          id: string
+          label: string
+          note: string | null
+          owner: Database["public"]["Enums"]["assignee"] | null
+          packed: boolean
+          sort_order: number
+          updated_at: string
+        }
+        Insert: {
+          category: string
+          created_at?: string
+          id?: string
+          label: string
+          note?: string | null
+          owner?: Database["public"]["Enums"]["assignee"] | null
+          packed?: boolean
+          sort_order?: number
+          updated_at?: string
+        }
+        Update: {
+          category?: string
+          created_at?: string
+          id?: string
+          label?: string
+          note?: string | null
+          owner?: Database["public"]["Enums"]["assignee"] | null
+          packed?: boolean
+          sort_order?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      day_of_roles: {
+        Row: {
+          confirmed: boolean
+          contact: string | null
+          created_at: string
+          fee: number | null
+          id: string
+          note: string | null
+          person_name: string | null
+          role: string
+          side: Database["public"]["Enums"]["wedding_side"]
+          sort_order: number
+          updated_at: string
+        }
+        Insert: {
+          confirmed?: boolean
+          contact?: string | null
+          created_at?: string
+          fee?: number | null
+          id?: string
+          note?: string | null
+          person_name?: string | null
+          role: string
+          side?: Database["public"]["Enums"]["wedding_side"]
+          sort_order?: number
+          updated_at?: string
+        }
+        Update: {
+          confirmed?: boolean
+          contact?: string | null
+          created_at?: string
+          fee?: number | null
+          id?: string
+          note?: string | null
+          person_name?: string | null
+          role?: string
+          side?: Database["public"]["Enums"]["wedding_side"]
+          sort_order?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
       members: {
         Row: {
           created_at: string
@@ -210,14 +374,42 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      day_of_schedule: {
+        Row: {
+          duration_min: number | null
+          ends_at: string | null
+          id: string | null
+          location: string | null
+          note: string | null
+          offset_min: number | null
+          phase: Database["public"]["Enums"]["day_of_phase"] | null
+          role_id: string | null
+          role_name: string | null
+          role_person: string | null
+          sort_order: number | null
+          starts_at: string | null
+          status: Database["public"]["Enums"]["task_status"] | null
+          title: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "day_of_events_role_id_fkey"
+            columns: ["role_id"]
+            isOneToOne: false
+            referencedRelation: "day_of_roles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Functions: {
       is_member: { Args: never; Returns: boolean }
     }
     Enums: {
       assignee: "주호" | "지영" | "같이"
+      day_of_phase: "준비" | "접수" | "예식" | "촬영" | "연회" | "마무리"
       task_status: "todo" | "doing" | "done" | "hold"
+      wedding_side: "신랑" | "신부" | "공통"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -349,7 +541,9 @@ export const Constants = {
   public: {
     Enums: {
       assignee: ["주호", "지영", "같이"],
+      day_of_phase: ["준비", "접수", "예식", "촬영", "연회", "마무리"],
       task_status: ["todo", "doing", "done", "hold"],
+      wedding_side: ["신랑", "신부", "공통"],
     },
   },
 } as const

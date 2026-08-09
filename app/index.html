@@ -1,10 +1,14 @@
 <!doctype html>
-<html lang="en">
+<html lang="ko">
   <head>
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>app</title>
+    <!-- viewport-fit=cover 가 있어야 env(safe-area-inset-*) 가 실제 값을 반환한다.
+         없으면 tokens.css 의 --safe-* 가 전부 0px 로 폴백되어 노치 대응이 죽는다. -->
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <!-- 루트 문서들과 동일하게 검색엔진 수집을 막는다. 개인 일정·예산이 담긴다. -->
+    <meta name="robots" content="noindex, nofollow" />
+    <title>결혼 준비 체크리스트</title>
   </head>
   <body>
     <div id="root"></div>

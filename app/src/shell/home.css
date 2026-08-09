@@ -1,0 +1,468 @@
+/* ============================================================
+   home.css — 홈 대시보드 전용 스타일
+
+   규칙
+   1. 색은 전부 tokens.css 변수. 상태색을 글자로 쓸 때는 color-mix 로 --ink 를 섞는다
+      (--warn 은 밝은 노랑이라 라이트 테마에서 그대로 쓰면 읽히지 않는다).
+   2. 클래스는 전부 hm- 접두어.
+   3. 카드에 공용 .card 클래스를 붙이지 않고 같은 recipe 를 여기서 다시 쓴다.
+      index.css 의 .card 는 '문서형 카드'를 가정해 자식에게
+        .card p  { font-size:14px; margin:0 0 9px }
+        .card ul { padding-left:17px }
+        .card li { font-size:14px; margin:0 0 6px }
+      를 건다. 전부 (0,1,1) 이라 대시보드 쪽 단일 클래스(0,1,0)를 이겨버린다
+      (실제로 D-day 숫자 46px 가 14px 로 깔렸었다).
+      이길 방법은 선택자를 두 겹으로 쌓는 것뿐인데, 그러면 이 파일 전체가
+      군더더기 선택자로 덮인다. 면(surface) 정의는 네 줄이므로 그냥 복제한다.
+      값은 index.css .card 와 동일하며 전부 토큰에서 온다.
+   ============================================================ */
+
+.hm {
+  padding-top: 16px;
+}
+
+.hm-card,
+.hm-hero {
+  background: var(--surface);
+  border: 1px solid var(--hair);
+  border-radius: var(--radius);
+  padding: 16px;
+  margin: 0 0 13px;
+}
+
+/* 스크린리더 전용 텍스트 */
+.hm-sr {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* ── D-day (루트 index.html 의 .dday 승계) ───────────────── */
+
+.hm-hero {
+  text-align: center;
+  padding: 20px 16px 16px;
+}
+
+/* :where 로 특정도를 0 으로 만든다. `.hm-hero p`(0,1,1) 로 쓰면 아래 개별 규칙
+   (.hm-hero__n 등, 0,1,0)의 margin-top 을 이 초기화가 도로 지운다. */
+.hm-hero :where(p) {
+  margin: 0;
+}
+
+.hm-hero__eyebrow {
+  font-size: 11px;
+  letter-spacing: .18em;
+  color: var(--muted);
+  font-weight: 700;
+}
+
+.hm-hero__n {
+  font-size: 46px;
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: -.03em;
+  font-variant-numeric: tabular-nums;
+  margin-top: 12px;
+}
+
+.hm-hero__l {
+  font-size: 12px;
+  color: var(--muted);
+  font-weight: 600;
+  margin-top: 7px;
+}
+
+.hm-hero__where {
+  font-size: 12.5px;
+  color: var(--ink-2);
+  margin-top: 12px;
+  padding-top: 11px;
+  border-top: 1px solid var(--hair);
+}
+
+/* ── 요약 카드 ───────────────────────────────────────────
+   카드 전체가 탭 영역. 투명한 버튼(.hm-card__link)이 카드를 덮는다.
+   내용은 일반 마크업 그대로라 스크린리더가 표·목록으로 읽는다. */
+
+.hm-card {
+  position: relative;
+}
+
+.hm-card__title {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--ink-2);
+  margin: 0 0 10px;
+}
+
+.hm-chev {
+  color: var(--muted);
+  font-size: 20px;
+  font-weight: 400;
+  line-height: 1;
+}
+
+.hm-card__link {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  padding: 0;
+  border: 0;
+  background: none;
+  border-radius: var(--radius);
+  cursor: pointer;
+  /* 카드 안의 진짜 버튼(다시 시도)은 z-index 로 이 덮개 위에 올라온다. */
+  z-index: 0;
+}
+
+.hm-card__link:active {
+  background: color-mix(in srgb, var(--ink) 5%, transparent);
+}
+
+/* :has 를 지원하면 누를 때 카드가 살짝 눌린다. 없으면 위의 틴트만 남는다. */
+.hm-card:has(.hm-card__link:active) {
+  transform: scale(.994);
+}
+
+.hm-card__body > *:first-child {
+  margin-top: 0;
+}
+
+/* ── 숫자 줄 ─────────────────────────────────────────────── */
+
+.hm-statline {
+  display: flex;
+  align-items: baseline;
+  gap: 4px;
+  margin: 0 0 10px;
+  font-size: 14px;
+}
+
+.hm-stat {
+  font-size: 30px;
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: -.03em;
+  font-variant-numeric: tabular-nums;
+  color: var(--ink);
+}
+
+.hm-stat--won {
+  font-size: 24px;
+}
+
+.hm-stat__unit {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--ink-2);
+}
+
+.hm-statline__side {
+  margin-left: auto;
+  font-size: 12px;
+  color: var(--muted);
+  text-align: right;
+}
+
+/* ── 진행 바 ─────────────────────────────────────────────── */
+
+.hm-bar {
+  height: 8px;
+  border-radius: 999px;
+  background: var(--surface-2);
+  overflow: hidden;
+}
+
+.hm-bar__fill {
+  height: 100%;
+  border-radius: 999px;
+  background: var(--s1);
+  transition: width .35s ease;
+}
+
+.hm-bar__fill--done {
+  background: var(--good);
+}
+
+.hm-cats {
+  list-style: none;
+  margin: 12px 0 0;
+  padding: 0;
+}
+
+.hm-cat {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  margin: 0;
+  padding: 5px 0;
+  font-size: 12.5px;
+}
+
+.hm-cat__name {
+  flex: 0 0 auto;
+  max-width: 38%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--ink-2);
+}
+
+.hm-cat__track {
+  flex: 1 1 auto;
+  height: 5px;
+  border-radius: 999px;
+  background: var(--surface-2);
+  overflow: hidden;
+}
+
+.hm-cat__fill {
+  display: block;
+  height: 100%;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--s1) 70%, var(--surface-2));
+}
+
+.hm-cat__n {
+  flex: 0 0 auto;
+  font-size: 11.5px;
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+
+/* ── 임박 · 지연 목록 ─────────────────────────────────────── */
+
+.hm-sec {
+  margin-top: 12px;
+}
+
+.hm-sec:first-child {
+  margin-top: 0;
+}
+
+.hm-sec__h {
+  margin: 0 0 4px;
+  font-size: 11.5px;
+  font-weight: 700;
+  letter-spacing: .03em;
+  color: var(--muted);
+}
+
+/* 지연은 색과 배경으로 따로 세운다. 그냥 목록에 섞으면 눈에 걸리지 않는다. */
+.hm-sec--over {
+  margin: 0 -6px 4px;
+  padding: 9px 10px 7px;
+  border-radius: 10px;
+  background: color-mix(in srgb, var(--crit) 8%, transparent);
+  border: 1px solid color-mix(in srgb, var(--crit) 26%, transparent);
+}
+
+.hm-sec--over .hm-sec__h {
+  color: color-mix(in srgb, var(--crit) 82%, var(--ink));
+}
+
+.hm-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.hm-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0;
+  padding: 7px 0;
+  font-size: 14px;
+  border-top: 1px solid var(--hair);
+}
+
+.hm-item:first-child {
+  border-top: 0;
+}
+
+.hm-item__text {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.hm-item__title {
+  display: block;
+  font-size: 13.5px;
+  color: var(--ink);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.hm-item__meta {
+  display: block;
+  margin-top: 1px;
+  font-size: 11px;
+  color: var(--muted);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.hm-due {
+  flex: 0 0 auto;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 3px 9px;
+  border-radius: 999px;
+  background: var(--surface-2);
+  color: var(--ink-2);
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+
+.hm-due--soon {
+  background: color-mix(in srgb, var(--warn) 20%, transparent);
+  color: color-mix(in srgb, var(--warn) 62%, var(--ink));
+}
+
+.hm-due--over {
+  background: color-mix(in srgb, var(--crit) 16%, transparent);
+  color: color-mix(in srgb, var(--crit) 82%, var(--ink));
+}
+
+.hm-more,
+.hm-foot {
+  margin: 6px 0 0;
+  font-size: 11.5px;
+  color: var(--muted);
+}
+
+/* ── 예산 ────────────────────────────────────────────────── */
+
+.hm-kv {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 7px 12px;
+  margin: 0;
+  font-size: 13px;
+}
+
+.hm-kv dt {
+  color: var(--muted);
+}
+
+.hm-kv dd {
+  margin: 0;
+  text-align: right;
+  font-weight: 700;
+  color: var(--ink);
+  font-variant-numeric: tabular-nums;
+}
+
+/* `.hm-kv dd`(0,1,1) 가 걸어둔 color 를 이겨야 하므로 클래스를 두 겹으로 쌓는다. */
+.hm-kv .hm-over {
+  color: color-mix(in srgb, var(--crit) 82%, var(--ink));
+}
+
+.hm-kv .hm-under {
+  color: color-mix(in srgb, var(--good) 84%, var(--ink));
+}
+
+/* ── 보조 문구 ───────────────────────────────────────────── */
+
+.hm-line {
+  margin: 0;
+  font-size: 13.5px;
+  color: var(--ink);
+}
+
+.hm-empty {
+  margin: 4px 0 0;
+  font-size: 12.5px;
+  color: var(--muted);
+}
+
+/* ── 실패 / 로딩 ─────────────────────────────────────────── */
+
+.hm-fail {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+.hm-fail__msg {
+  margin: 0;
+  font-size: 12.5px;
+  color: color-mix(in srgb, var(--crit) 82%, var(--ink));
+  overflow-wrap: anywhere;
+}
+
+.hm-retry {
+  /* 카드 전체를 덮은 이동 버튼 위로 올려야 눌린다. */
+  position: relative;
+  z-index: 1;
+  min-height: 36px;
+  padding: 0 14px;
+  border: 1px solid var(--hair);
+  border-radius: 999px;
+  background: var(--surface-2);
+  color: var(--ink-2);
+  font: inherit;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.hm-sk {
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+}
+
+.hm-sk__bar {
+  height: 11px;
+  width: 100%;
+  border-radius: 6px;
+  background: var(--surface-2);
+  animation: hm-pulse 1.5s ease-in-out infinite;
+}
+
+.hm-sk__bar--stat {
+  height: 26px;
+  width: 46%;
+  border-radius: 8px;
+}
+
+@keyframes hm-pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+
+  50% {
+    opacity: .45;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hm-sk__bar {
+    animation: none;
+  }
+
+  .hm-bar__fill {
+    transition: none;
+  }
+
+  .hm-card:has(.hm-card__link:active) {
+    transform: none;
+  }
+}

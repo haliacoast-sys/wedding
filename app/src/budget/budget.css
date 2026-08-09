@@ -1,0 +1,994 @@
+/* ============================================================
+   budget.css — 예산 화면 전용 스타일
+
+   규칙
+   1. 색은 전부 tokens.css 의 변수에서 나온다. 하드코딩된 색상값이 없다.
+      배경 워시가 필요한 곳은 color-mix() 로 토큰에서 만든다.
+   2. 클래스는 전부 bd- 접두어. index.css 의 공용 .card/.pill/.tab 과 이름이 겹치면
+      다른 에이전트가 그쪽을 고칠 때 이 화면이 같이 흔들린다.
+   3. 대비 보정: --crit/--warn/--good 을 글자색으로 그대로 쓰면 한쪽 테마에서 읽히지 않는다.
+      --ink 를 섞어 테마별로 알아서 어두워지거나 밝아지게 한다.
+   4. 폼 요소 글자는 16px 이상. 그 아래면 iOS Safari 가 포커스할 때 화면을 확대하고,
+      확대된 화면은 사용자가 손으로 되돌려야 한다.
+   5. 하단 네비게이션(56px + 안전영역)에 가리는 것이 없어야 한다.
+      화면 하단에 고정되는 것은 실행취소 스낵바 하나뿐이고, 그것도 네비 위로 띄운다.
+   ============================================================ */
+
+.bd-app {
+  --bd-tap: 44px;
+  --bd-nav: calc(56px + var(--safe-bottom, 0px));
+  /* --good(#0ca30c) 를 그대로 글자색으로 쓰면 라이트 테마의 흰 면 위에서 4.4:1 밖에 안 나온다.
+     11~12px 작은 글씨로 쓰는 자리라 --ink 를 26% 섞어 5:1 이상으로 끌어올렸다.
+     다크 테마에서는 --ink 가 흰색이라 같은 식이 반대로 밝게 만든다. */
+  --bd-crit-ink: color-mix(in srgb, var(--crit) 82%, var(--ink));
+  --bd-good-ink: color-mix(in srgb, var(--good) 74%, var(--ink));
+
+  max-width: 720px;
+  margin: 0 auto;
+  /* 하단 네비 높이 + 스낵바가 뜰 자리까지 비워 둔다. */
+  padding: 0 14px calc(var(--bd-nav) + 32px);
+}
+
+.bd-app *,
+.bd-app *::before,
+.bd-app *::after {
+  box-sizing: border-box;
+}
+
+/* :where() 로 특정도를 0 으로 만든다. `.bd-app button` (0,1,1) 로 쓰면 뒤에 오는
+   .bd-btn--primary (0,1,0) 의 color 를 이겨서 버튼 글자가 배경에 묻힌다. */
+:where(.bd-app button, .bd-app input, .bd-app select, .bd-app textarea) {
+  font-family: inherit;
+  color: inherit;
+}
+
+:where(.bd-app button) {
+  cursor: pointer;
+}
+
+.bd-app :focus-visible {
+  outline: 2px solid var(--s1);
+  outline-offset: 2px;
+  border-radius: 8px;
+}
+
+/* 스크린리더 전용 */
+.bd-sr {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+/* ── 머리말 ───────────────────────────────────────────── */
+
+.bd-head {
+  padding: calc(20px + var(--safe-top, 0px)) 0 12px;
+}
+
+.bd-head__title {
+  font-size: 22px;
+  font-weight: 700;
+  margin: 0 0 5px;
+}
+
+.bd-head__sub {
+  margin: 0;
+  font-size: 12.5px;
+  line-height: 1.55;
+  color: var(--muted);
+}
+
+/* ── 상단 고정 집계 줄 ────────────────────────────────── */
+
+.bd-strip {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  /* 배경이 반투명하면 목록 글자가 비쳐서 숫자가 안 읽힌다. 불투명 면으로 덮는다. */
+  background: var(--plane);
+  border-bottom: 1px solid var(--hair);
+  /* .bd-app 의 좌우 여백을 넘어 화면 끝까지 선이 가도록 밖으로 밀어낸다.
+     margin 만 음수로 주면 폭이 늘어난 만큼 가로 스크롤이 생기므로 padding 으로 되돌린다. */
+  margin: 0 -14px;
+  padding: 9px 14px 0;
+}
+
+.bd-strip__row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.bd-strip__cell {
+  flex: 1 1 0;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.bd-k {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: .02em;
+  color: var(--muted);
+}
+
+.bd-v {
+  font-size: 15px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -.02em;
+  color: var(--ink);
+  /* 12자리 금액이 들어와도 줄을 밀어내지 않는다. */
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.bd-v--over {
+  color: var(--bd-crit-ink);
+}
+
+.bd-v--under {
+  color: var(--bd-good-ink);
+}
+
+/* 실시간 연결 표시 — 점 하나. 글자로 쓰면 줄이 좁아진다. */
+.bd-live {
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+}
+
+.bd-live i {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--muted);
+  display: block;
+}
+
+.bd-live--live i {
+  background: var(--good);
+}
+
+.bd-live--offline i {
+  background: var(--crit);
+}
+
+.bd-strip__bar {
+  height: 3px;
+  margin-top: 8px;
+  background: var(--grid);
+}
+
+.bd-strip__bar i {
+  display: block;
+  height: 100%;
+  background: var(--s1);
+  transition: width .25s ease;
+}
+
+/* ── 카드 ─────────────────────────────────────────────── */
+
+.bd-card {
+  background: var(--surface);
+  border: 1px solid var(--hair);
+  border-radius: var(--radius);
+  padding: 15px;
+  margin: 13px 0;
+}
+
+/* ── 집계 상세 ────────────────────────────────────────── */
+
+.bd-sum__head {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.bd-sum__big {
+  font-size: 30px;
+  font-weight: 700;
+  letter-spacing: -.035em;
+  font-variant-numeric: tabular-nums;
+  line-height: 1.15;
+  overflow-wrap: anywhere;
+}
+
+.bd-sum__man {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--s1);
+}
+
+.bd-sum__note {
+  margin: 5px 0 0;
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--muted);
+}
+
+.bd-sum__note b {
+  color: var(--ink-2);
+}
+
+.bd-sum__pay {
+  margin-top: 15px;
+  padding-top: 13px;
+  border-top: 1px solid var(--hair);
+}
+
+.bd-payrow {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 3px 0;
+}
+
+.bd-payrow__k {
+  flex: 1 1 auto;
+  font-size: 13px;
+  color: var(--ink-2);
+}
+
+.bd-payrow__v {
+  font-size: 14.5px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.bd-dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  flex: 0 0 auto;
+}
+
+.bd-dot--paid {
+  background: var(--s1);
+}
+
+.bd-dot--unpaid {
+  background: var(--grid);
+  border: 1px solid var(--axis);
+}
+
+.bd-bar {
+  height: 8px;
+  border-radius: 999px;
+  background: var(--surface-2);
+  border: 1px solid var(--hair);
+  overflow: hidden;
+  margin: 8px 0 0;
+}
+
+.bd-bar i {
+  display: block;
+  height: 100%;
+  background: var(--s1);
+  transition: width .25s ease;
+}
+
+.bd-bar--thin {
+  height: 5px;
+  margin: 4px 0 0;
+  border: none;
+  background: var(--grid);
+}
+
+.bd-sum__diff {
+  margin-top: 15px;
+  padding-top: 13px;
+  border-top: 1px solid var(--hair);
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.bd-sum__diff strong {
+  font-size: 21px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -.03em;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.bd-sum__tag {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: color-mix(in srgb, currentcolor 14%, transparent);
+}
+
+/* ── 카테고리별 비중 ──────────────────────────────────── */
+
+.bd-cats {
+  margin-top: 15px;
+  padding-top: 13px;
+  border-top: 1px solid var(--hair);
+}
+
+.bd-cats__list {
+  list-style: none;
+  margin: 8px 0 0;
+  padding: 0;
+}
+
+.bd-cat + .bd-cat {
+  margin-top: 10px;
+}
+
+.bd-cat__head {
+  display: flex;
+  align-items: baseline;
+  gap: 7px;
+  font-size: 13px;
+}
+
+.bd-cat__name {
+  font-weight: 600;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.bd-cat__count {
+  font-size: 11px;
+  color: var(--muted);
+  flex: 1 1 auto;
+}
+
+.bd-cat__won {
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+}
+
+.bd-cat__pct {
+  font-size: 11.5px;
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+  min-width: 30px;
+  text-align: right;
+}
+
+/* ── 추가 ─────────────────────────────────────────────── */
+
+.bd-addopen {
+  width: 100%;
+  min-height: var(--bd-tap);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px;
+  margin: 0 0 13px;
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--surface);
+  background: var(--ink);
+  border: none;
+  border-radius: var(--radius);
+}
+
+.bd-addopen__plus {
+  font-size: 19px;
+  line-height: 1;
+  font-weight: 400;
+}
+
+.bd-compose {
+  background: var(--surface);
+  border: 1px solid var(--s1);
+  border-radius: var(--radius);
+  padding: 14px;
+  margin: 0 0 13px;
+}
+
+.bd-compose__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 10px;
+  font-size: 14px;
+}
+
+.bd-compose__foot,
+.bd-editor__foot {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 14px;
+  padding-top: 12px;
+  border-top: 1px solid var(--hair);
+}
+
+.bd-compose__hint,
+.bd-editor__hint {
+  flex: 1 1 auto;
+  font-size: 11.5px;
+  line-height: 1.4;
+  color: var(--muted);
+}
+
+/* ── 폼 요소 ──────────────────────────────────────────── */
+
+.bd-field {
+  display: block;
+  margin-bottom: 12px;
+}
+
+.bd-field:last-child {
+  margin-bottom: 0;
+}
+
+.bd-field__label {
+  display: block;
+  font-size: 11.5px;
+  font-weight: 600;
+  color: var(--muted);
+  margin-bottom: 5px;
+}
+
+.bd-input {
+  width: 100%;
+  min-height: var(--bd-tap);
+  /* 16px 미만이면 iOS Safari 가 포커스 시 확대한다. 지키지 않으면 입력할 때마다 화면이 튄다. */
+  font-size: 16px;
+  padding: 9px 11px;
+  background: var(--plane);
+  color: var(--ink);
+  border: 1px solid var(--hair);
+  border-radius: 10px;
+  appearance: none;
+}
+
+.bd-input::placeholder {
+  color: var(--muted);
+}
+
+.bd-input:focus {
+  border-color: var(--s1);
+  outline: none;
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--s1) 20%, transparent);
+}
+
+.bd-textarea {
+  min-height: 60px;
+  resize: vertical;
+  line-height: 1.5;
+}
+
+.bd-select {
+  /* 기본 화살표를 지웠으니 직접 그린다. currentcolor 라 테마를 따라간다. */
+  background-image: linear-gradient(45deg, transparent 50%, currentcolor 50%),
+    linear-gradient(135deg, currentcolor 50%, transparent 50%);
+  background-position: right 15px top 50%, right 10px top 50%;
+  background-size: 5px 5px, 5px 5px;
+  background-repeat: no-repeat;
+  padding-right: 30px;
+}
+
+.bd-input--date {
+  /* iOS 는 date 입력의 내용 높이가 제각각이라 최소 높이를 못 박아 둔다. */
+  min-height: var(--bd-tap);
+}
+
+.bd-grid2 {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 12px;
+}
+
+@media (min-width: 480px) {
+  .bd-grid2 {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.bd-daterow {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  flex-wrap: wrap;
+}
+
+.bd-daterow .bd-input--date {
+  flex: 1 1 150px;
+  min-width: 0;
+}
+
+/* ── 금액 입력 ────────────────────────────────────────── */
+
+.bd-money__box {
+  position: relative;
+}
+
+.bd-input--money {
+  text-align: right;
+  padding-right: 34px;
+  font-size: 17px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -.01em;
+}
+
+.bd-money__unit {
+  position: absolute;
+  right: 11px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 13px;
+  color: var(--muted);
+  pointer-events: none;
+}
+
+.bd-money__quick {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 7px;
+}
+
+.bd-quickbtn {
+  min-height: var(--bd-tap);
+  min-width: var(--bd-tap);
+  padding: 0 12px;
+  font-size: 13px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  color: var(--s1);
+  background: color-mix(in srgb, var(--s1) 10%, transparent);
+  border: 1px solid transparent;
+  border-radius: 10px;
+}
+
+.bd-quickbtn--clear {
+  color: var(--ink-2);
+  background: var(--surface-2);
+  font-weight: 600;
+}
+
+.bd-quickbtn:disabled {
+  opacity: .4;
+  cursor: default;
+}
+
+.bd-money__hint {
+  margin-top: 5px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--muted);
+  text-align: right;
+}
+
+/* ── 칩 · 툴바 ────────────────────────────────────────── */
+
+.bd-chiprow {
+  display: flex;
+  gap: 6px;
+  overflow-x: auto;
+  /* 가로 스크롤은 이 줄 안에서만 일어나야 한다. body 로 새 나가면 화면 전체가 흔들린다. */
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+  padding-bottom: 2px;
+}
+
+.bd-chiprow::-webkit-scrollbar {
+  display: none;
+}
+
+.bd-chiprow--tight {
+  flex-wrap: wrap;
+  overflow: visible;
+}
+
+.bd-chip {
+  flex: 0 0 auto;
+  min-height: var(--bd-tap);
+  padding: 0 14px;
+  font-size: 13px;
+  font-weight: 600;
+  white-space: nowrap;
+  color: var(--ink-2);
+  background: var(--surface);
+  border: 1px solid var(--hair);
+  border-radius: 999px;
+  transition: background .15s, color .15s, border-color .15s;
+}
+
+.bd-chip[aria-pressed='true'] {
+  background: var(--ink);
+  color: var(--surface);
+  border-color: var(--ink);
+}
+
+.bd-chip--sm {
+  padding: 0 11px;
+  font-size: 12.5px;
+}
+
+.bd-toolbar {
+  margin: 0 0 10px;
+}
+
+.bd-toolbar__row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 6px;
+  flex-wrap: wrap;
+}
+
+.bd-toolbar__sum {
+  margin-left: auto;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+
+/* ── 목록 ─────────────────────────────────────────────── */
+
+.bd-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.bd-li {
+  background: var(--surface);
+  border: 1px solid var(--hair);
+  border-radius: var(--radius);
+  margin-bottom: 8px;
+  overflow: hidden;
+}
+
+.bd-li--open {
+  border-color: var(--s1);
+}
+
+.bd-row {
+  width: 100%;
+  min-height: 62px;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 12px 13px;
+  background: none;
+  border: none;
+  text-align: left;
+}
+
+.bd-row__main {
+  flex: 1 1 auto;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.bd-row__label {
+  font-size: 14.5px;
+  font-weight: 600;
+  line-height: 1.35;
+  /* 긴 항목명이 가로 스크롤을 만들지 않게 어디서든 접는다. */
+  overflow-wrap: anywhere;
+}
+
+.bd-row__meta {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+  font-size: 11.5px;
+  color: var(--muted);
+}
+
+.bd-tag {
+  font-size: 11px;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: var(--surface-2);
+  color: var(--ink-2);
+  /* 시드 데이터의 '예식장(CA웨딩컨벤션)' 처럼 긴 이름이 줄을 다 먹지 않게 자른다. */
+  max-width: 45vw;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.bd-row__vendor {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 40vw;
+}
+
+.bd-row__paid {
+  color: var(--bd-good-ink);
+  font-weight: 600;
+}
+
+.bd-row__due {
+  color: var(--muted);
+}
+
+.bd-row__nums {
+  flex: 0 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 2px;
+  text-align: right;
+}
+
+.bd-amt {
+  font-size: 15.5px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -.02em;
+  white-space: nowrap;
+}
+
+.bd-amt--est {
+  color: var(--ink-2);
+  font-weight: 600;
+}
+
+.bd-amt__mark {
+  font-size: 10px;
+  font-style: normal;
+  font-weight: 700;
+  margin-left: 4px;
+  padding: 1px 5px;
+  border-radius: 4px;
+  background: var(--surface-2);
+  color: var(--muted);
+  vertical-align: 1px;
+}
+
+.bd-row__sub {
+  font-size: 11.5px;
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.bd-delta {
+  margin-left: 5px;
+  font-weight: 700;
+}
+
+.bd-delta--over {
+  color: var(--bd-crit-ink);
+}
+
+.bd-delta--under {
+  color: var(--bd-good-ink);
+}
+
+.bd-nores {
+  margin: 18px 0;
+  text-align: center;
+  font-size: 13px;
+  color: var(--muted);
+}
+
+/* ── 편집기 ───────────────────────────────────────────── */
+
+.bd-editor {
+  padding: 4px 13px 14px;
+  border-top: 1px solid var(--hair);
+  background: color-mix(in srgb, var(--surface-2) 60%, var(--surface));
+}
+
+.bd-editor > .bd-field:first-of-type {
+  margin-top: 12px;
+}
+
+.bd-vendor__new {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+
+.bd-vendor__new .bd-input {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.bd-vendor__err {
+  margin: 5px 0 0;
+  font-size: 11.5px;
+  color: var(--bd-crit-ink);
+}
+
+/* ── 버튼 ─────────────────────────────────────────────── */
+
+.bd-btn {
+  min-height: var(--bd-tap);
+  min-width: var(--bd-tap);
+  padding: 0 15px;
+  font-size: 14px;
+  font-weight: 700;
+  border-radius: 10px;
+  border: 1px solid transparent;
+  background: var(--surface-2);
+  color: var(--ink);
+  white-space: nowrap;
+}
+
+.bd-btn--sm {
+  padding: 0 11px;
+  font-size: 13px;
+}
+
+.bd-btn--primary {
+  background: var(--ink);
+  color: var(--surface);
+}
+
+.bd-btn--ghost {
+  background: transparent;
+  border-color: var(--hair);
+  color: var(--ink-2);
+  font-weight: 600;
+}
+
+.bd-btn--danger {
+  background: color-mix(in srgb, var(--crit) 12%, transparent);
+  color: var(--bd-crit-ink);
+}
+
+.bd-btn:disabled {
+  opacity: .45;
+  cursor: default;
+}
+
+/* ── 실행취소 스낵바 ──────────────────────────────────── */
+
+.bd-snack {
+  position: fixed;
+  left: 12px;
+  right: 12px;
+  /* 하단 네비게이션 위. 여기를 줄이면 스낵바가 네비에 가려 실행취소를 누를 수 없다. */
+  bottom: calc(var(--bd-nav) + 12px);
+  z-index: 60;
+  max-width: 696px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 10px 10px 14px;
+  border-radius: 12px;
+  background: var(--ink);
+  color: var(--plane);
+  /* 그림자는 팔레트 색이 아니라 '빛이 가려진 정도'다. 토큰으로 만들면 다크 테마에서
+     --ink 가 흰색이라 밝은 후광이 생긴다. 그래서 여기만 검정 알파를 쓴다. */
+  box-shadow: 0 6px 22px rgba(0, 0, 0, .28);
+  animation: bd-snack-in .18s ease-out;
+}
+
+@keyframes bd-snack-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .bd-snack {
+    animation: none;
+  }
+}
+
+.bd-snack__text {
+  flex: 1 1 auto;
+  min-width: 0;
+  font-size: 13.5px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.bd-snack__undo {
+  flex: 0 0 auto;
+  min-height: var(--bd-tap);
+  padding: 0 14px;
+  font-size: 13.5px;
+  font-weight: 700;
+  color: var(--plane);
+  background: color-mix(in srgb, var(--plane) 18%, transparent);
+  border: none;
+  border-radius: 9px;
+}
+
+.bd-snack__undo i {
+  font-style: normal;
+  font-variant-numeric: tabular-nums;
+  opacity: .65;
+  margin-left: 4px;
+}
+
+/* ── 상태 화면 ────────────────────────────────────────── */
+
+.bd-state__title {
+  font-size: 15px;
+  font-weight: 700;
+  margin: 0 0 7px;
+}
+
+.bd-state__body {
+  margin: 0 0 8px;
+  font-size: 13px;
+  line-height: 1.6;
+  color: var(--ink-2);
+}
+
+.bd-state__body:last-child {
+  margin-bottom: 0;
+}
+
+.bd-state__meta {
+  font-size: 11.5px;
+  color: var(--muted);
+}
+
+.bd-state code {
+  font-size: 12px;
+  padding: 1px 5px;
+  border-radius: 5px;
+  background: var(--surface-2);
+}
+
+.bd-state--err {
+  border-color: color-mix(in srgb, var(--crit) 45%, var(--hair));
+}
+
+.bd-state .bd-btn {
+  margin-top: 4px;
+}
+
+.bd-skel {
+  padding: 6px 0;
+}
+
+.bd-skel__row {
+  height: 62px;
+  border-radius: var(--radius);
+  margin-bottom: 8px;
+  background: linear-gradient(
+    90deg,
+    var(--surface) 0%,
+    var(--surface-2) 50%,
+    var(--surface) 100%
+  );
+  background-size: 200% 100%;
+  animation: bd-shimmer 1.2s linear infinite;
+}
+
+@keyframes bd-shimmer {
+  to {
+    background-position: -200% 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .bd-skel__row {
+    animation: none;
+    background: var(--surface-2);
+  }
+}

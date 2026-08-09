@@ -1,0 +1,133 @@
+/* ============================================================
+   tokens.css — 디자인 토큰 (단일 출처)
+
+   출처: 저장소 루트의 두 정적 문서에 인라인으로 있던 CSS 변수의 합집합
+     - /index.html      (라이트 + prefers-color-scheme 다크)
+     - /wedding.html    (라이트 + prefers-color-scheme 다크 + data-theme 수동 오버라이드)
+
+   테마 전략은 wedding.html 방식을 채택했습니다.
+     1) :root                                        → 라이트 기본값
+     2) @media (prefers-color-scheme:dark)
+        :root:where(:not([data-theme="light"]))      → OS 다크 (수동 라이트 지정 시 제외)
+     3) :root[data-theme="dark"]                     → 수동 다크 (미디어쿼리보다 우선)
+   :where() 는 특정도 0 이므로 (2)는 :root 와 같은 특정도(0,1,0),
+   (3)은 (0,2,0)이라 항상 (2)를 이깁니다. 즉 수동 토글이 OS 설정을 덮어씁니다.
+
+   두 파일 간 변수 값 충돌: 없음.
+   같은 이름으로 양쪽에 존재하는 --plane / --surface / --surface-2 / --ink /
+   --ink-2 / --muted / --hair / --s1 / --good 은 라이트·다크 모두 값이 동일했습니다.
+   (유일한 형태 차이: index.html 은 다크 블록에서 --good:#0ca30c 를 다시 선언하고
+    wedding.html 은 :root 값을 상속시킵니다. 결과값이 같으므로 wedding.html 방식대로
+    다크에서 재선언하지 않습니다.)
+
+   값은 두 문서에서 읽은 그대로이며 임의로 조정하지 않았습니다.
+   ============================================================ */
+
+:root {
+  color-scheme: light;
+
+  /* ── 배경 / 면 ── */
+  --plane: #f9f9f7;
+  --surface: #fcfcfb;
+  --surface-2: #f2f1ed;
+
+  /* ── 텍스트 ── */
+  --ink: #0b0b0b;
+  --ink-2: #52514e;
+  --muted: #898781;
+
+  /* ── 선 ── */
+  --grid: #e1e0d9;          /* wedding.html 전용 (표 구분선) */
+  --axis: #c3c2b7;          /* wedding.html 전용 (표 헤더선·강조 바) */
+  --hair: rgba(11, 11, 11, .10);
+
+  /* ── 시리즈 / 강조색 ── */
+  --s1: #2a78d6;
+  --s2: #eb6834;            /* wedding.html 전용 */
+  --s1-wash: rgba(42, 120, 214, .10);   /* wedding.html 전용 */
+  --s2-wash: rgba(235, 104, 52, .10);   /* wedding.html 전용 */
+
+  /* ── 상태색 ── (다크에서 재선언하지 않음 = 양 테마 공통, wedding.html 원본 동작) */
+  --good: #0ca30c;
+  --warn: #fab219;          /* wedding.html 전용 */
+  --serious: #ec835a;       /* wedding.html 전용 */
+  --crit: #d03b3b;          /* wedding.html 전용 */
+
+  /* ── 오행색 ── wedding.html 전용 (목·화·토·금·수) */
+  --mok: #1f7a5c;
+  --hwa: #c62f2f;
+  --to: #9c6a10;
+  --geum: #6b6a66;
+  --su: #1f4e9c;
+
+  /* ── 형태 ── */
+  --radius: 14px;           /* wedding.html 전용. 다크에서 재선언하지 않음 */
+
+  /* ── 신규 추가 ── 원본 문서에는 없던 변수.
+     이유: 두 문서 모두 viewport-fit=cover 를 쓰지만 노치/홈 인디케이터 여백을
+     매번 env(...) 로 인라인 계산했습니다. 앱에서는 body 하단 패딩과 sticky 탭 상단에서
+     반복 사용하므로 토큰으로 승격했습니다. 색상값이 아니라 레이아웃 상수이며
+     지원하지 않는 환경에서는 0px 로 폴백되어 기존 레이아웃과 동일합니다. */
+  --safe-top: env(safe-area-inset-top, 0px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+  --safe-left: env(safe-area-inset-left, 0px);
+  --safe-right: env(safe-area-inset-right, 0px);
+}
+
+/* OS 다크 — data-theme="light" 로 수동 고정한 경우는 제외 */
+@media (prefers-color-scheme: dark) {
+  :root:where(:not([data-theme="light"])) {
+    color-scheme: dark;
+
+    --plane: #0d0d0d;
+    --surface: #1a1a19;
+    --surface-2: #232322;
+
+    --ink: #fff;
+    --ink-2: #c3c2b7;
+    --muted: #898781;
+
+    --grid: #2c2c2a;
+    --axis: #383835;
+    --hair: rgba(255, 255, 255, .10);
+
+    --s1: #3987e5;
+    --s2: #d95926;
+    --s1-wash: rgba(57, 135, 229, .14);
+    --s2-wash: rgba(217, 89, 38, .14);
+
+    --mok: #4bc49a;
+    --hwa: #f07a7a;
+    --to: #d9a03c;
+    --geum: #b5b3ab;
+    --su: #6fa8f0;
+  }
+}
+
+/* 수동 다크 — 미디어쿼리보다 특정도가 높아 OS 설정을 덮어씁니다 */
+:root[data-theme="dark"] {
+  color-scheme: dark;
+
+  --plane: #0d0d0d;
+  --surface: #1a1a19;
+  --surface-2: #232322;
+
+  --ink: #fff;
+  --ink-2: #c3c2b7;
+  --muted: #898781;
+
+  --grid: #2c2c2a;
+  --axis: #383835;
+  --hair: rgba(255, 255, 255, .10);
+
+  --s1: #3987e5;
+  --s2: #d95926;
+  --s1-wash: rgba(57, 135, 229, .14);
+  --s2-wash: rgba(217, 89, 38, .14);
+
+  --mok: #4bc49a;
+  --hwa: #f07a7a;
+  --to: #d9a03c;
+  --geum: #b5b3ab;
+  --su: #6fa8f0;
+}

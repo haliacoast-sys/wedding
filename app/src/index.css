@@ -1,111 +1,164 @@
-:root {
-  --text: #6b6375;
-  --text-h: #08060d;
-  --bg: #fff;
-  --border: #e5e4e7;
-  --code-bg: #f4f3ec;
-  --accent: #aa3bff;
-  --accent-bg: rgba(170, 59, 255, 0.1);
-  --accent-border: rgba(170, 59, 255, 0.5);
-  --social-bg: rgba(244, 243, 236, 0.5);
-  --shadow:
-    rgba(0, 0, 0, 0.1) 0 10px 15px -3px, rgba(0, 0, 0, 0.05) 0 4px 6px -2px;
+@import './styles/tokens.css';
 
-  --sans: system-ui, 'Segoe UI', Roboto, sans-serif;
-  --heading: system-ui, 'Segoe UI', Roboto, sans-serif;
-  --mono: ui-monospace, Consolas, monospace;
+/* ============================================================
+   index.css — 전역 리셋 · 기본 타이포그래피 · 공용 유틸리티
 
-  font: 18px/145% var(--sans);
-  letter-spacing: 0.18px;
-  color-scheme: light dark;
-  color: var(--text);
-  background: var(--bg);
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+   Vite 리액트 템플릿의 기본 스타일은 전부 제거했습니다.
+   (제거 목록: #root 의 width:1126px / text-align:center / border-inline /
+    min-height:100svh / display:flex 제약, :root 의 18px·145% 타이포와
+    --text·--bg·--accent 등 템플릿 팔레트, h1 56px·h2 24px 헤딩 크기,
+    code/.counter 스타일, prefers-color-scheme 다크 팔레트 오버라이드,
+    #social .button-icon 필터.)
+    → 중앙정렬 flex 와 고정 다크 배경이 앱 레이아웃을 망가뜨리기 때문입니다.
 
-  @media (max-width: 1024px) {
-    font-size: 16px;
-  }
-}
+   아래 값은 저장소 루트 index.html / wedding.html 에서 그대로 승계했으며,
+   두 문서가 다를 때는 wedding.html 을 채택했습니다(각 항목 주석 참조).
+   ============================================================ */
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --text: #9ca3af;
-    --text-h: #f3f4f6;
-    --bg: #16171d;
-    --border: #2e303a;
-    --code-bg: #1f2028;
-    --accent: #c084fc;
-    --accent-bg: rgba(192, 132, 252, 0.15);
-    --accent-border: rgba(192, 132, 252, 0.5);
-    --social-bg: rgba(47, 48, 58, 0.5);
-    --shadow:
-      rgba(0, 0, 0, 0.4) 0 10px 15px -3px, rgba(0, 0, 0, 0.25) 0 4px 6px -2px;
-  }
-
-  #social .button-icon {
-    filter: invert(1) brightness(2);
-  }
-}
-
-#root {
-  width: 1126px;
-  max-width: 100%;
-  margin: 0 auto;
-  text-align: center;
-  border-inline: 1px solid var(--border);
-  min-height: 100svh;
-  display: flex;
-  flex-direction: column;
+* {
   box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
 }
 
 body {
-  margin: 0;
-}
-
-h1,
-h2 {
-  font-family: var(--heading);
-  font-weight: 500;
-  color: var(--text-h);
-}
-
-h1 {
-  font-size: 56px;
-  letter-spacing: -1.68px;
-  margin: 32px 0;
-  @media (max-width: 1024px) {
-    font-size: 36px;
-    margin: 20px 0;
-  }
-}
-h2 {
-  font-size: 24px;
-  line-height: 118%;
-  letter-spacing: -0.24px;
-  margin: 0 0 8px;
-  @media (max-width: 1024px) {
-    font-size: 20px;
-  }
-}
-p {
-  margin: 0;
-}
-
-code,
-.counter {
-  font-family: var(--mono);
-  display: inline-flex;
-  border-radius: 4px;
-  color: var(--text-h);
-}
-
-code {
+  background: var(--plane);
+  color: var(--ink);
+  font-family: system-ui, -apple-system, "Segoe UI", "Apple SD Gothic Neo", "Noto Sans KR", sans-serif;
   font-size: 15px;
-  line-height: 135%;
-  padding: 4px 8px;
-  background: var(--code-bg);
+  /* line-height: index.html 은 1.7, wedding.html 은 1.68 → wedding.html 채택 */
+  line-height: 1.68;
+  letter-spacing: -.01em;
+  /* padding-bottom: index.html 은 60px, wedding.html 은 64px → wedding.html 채택.
+     viewport-fit=cover 사용 시 홈 인디케이터에 가리지 않도록 안전영역을 더합니다. */
+  padding-bottom: calc(64px + var(--safe-bottom));
+}
+
+/* wedding.html 의 전역 헤딩 규칙 */
+h1,
+h2,
+h3,
+h4 {
+  line-height: 1.35;
+  letter-spacing: -.02em;
+  margin: 0;
+}
+
+a {
+  color: var(--s1);
+}
+
+/* ============================================================
+   유틸리티 — 두 문서에서 반복되던 패턴만 옮겼습니다.
+   ============================================================ */
+
+/* .wrap — index.html 은 max-width 640px / padding 0 16px,
+   wedding.html 은 720px / 0 14px → wedding.html 채택 */
+.wrap {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 0 14px;
+}
+
+/* .card — index.html 은 a.card (border-radius 16px, padding 18px 19px, margin 0 0 12px),
+   wedding.html 은 .card (border-radius var(--radius)=14px, padding 16px, margin 0 0 13px)
+   → wedding.html 채택. 아래 자식 규칙도 wedding.html 정의 그대로입니다. */
+.card {
+  background: var(--surface);
+  border: 1px solid var(--hair);
+  border-radius: var(--radius);
+  padding: 16px;
+  margin: 0 0 13px;
+}
+
+.card h3 {
+  font-size: 15.5px;
+  font-weight: 700;
+  margin-bottom: 9px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.card h4 {
+  font-size: 13.5px;
+  font-weight: 700;
+  margin: 15px 0 6px;
+  color: var(--ink);
+}
+
+.card p {
+  margin: 0 0 9px;
+  font-size: 14px;
+}
+
+.card p:last-child {
+  margin-bottom: 0;
+}
+
+.card ul {
+  margin: 0 0 9px;
+  padding-left: 17px;
+}
+
+.card li {
+  margin: 0 0 6px;
+  font-size: 14px;
+}
+
+.card li::marker {
+  color: var(--muted);
+}
+
+/* .pill — wedding.html 정의 그대로 */
+.pill {
+  display: inline-block;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 3px 9px;
+  border-radius: 999px;
+  background: var(--surface-2);
+  color: var(--ink-2);
+  border: 1px solid var(--hair);
+  letter-spacing: 0;
+}
+
+.pill.p1 {
+  background: var(--s1-wash);
+  color: var(--s1);
+  border-color: transparent;
+}
+
+.pill.p2 {
+  background: var(--s2-wash);
+  color: var(--s2);
+  border-color: transparent;
+}
+
+/* .tab — wedding.html 정의 그대로. 선택 상태는 aria-selected 로 표현합니다. */
+.tab {
+  flex: 0 0 auto;
+  border: 1px solid var(--hair);
+  background: var(--surface);
+  color: var(--ink-2);
+  border-radius: 999px;
+  padding: 8px 14px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+  font-family: inherit;
+  transition: .15s;
+}
+
+.tab[aria-selected="true"] {
+  background: var(--ink);
+  color: var(--surface);
+  border-color: var(--ink);
 }
