@@ -5,10 +5,9 @@
  *
  *   원본:  var ms = ceremony - now;  var d = Math.ceil(ms / 86400000)
  *
- * 예식 시각이 12:30 이라 남은 밀리초에는 항상 "반나절"이 섞여 있다.
- * 2026-08-09 06:00 에 보면 391.27일 → ceil → 392,
- * 같은 날 23:00 에 보면 390.56일 → ceil → 391 이 나온다.
- * 즉 같은 날인데 오전과 오후의 D-day 가 하루 어긋난다.
+ * 예식 시각이 자정이 아니라서 남은 밀리초에는 항상 하루 미만의 우수리가 섞여 있다.
+ * 그래서 같은 날인데도 보는 시각에 따라 ceil 결과가 하루 어긋난다
+ * (오전에 보면 392, 밤에 보면 391 이 나오는 식이다).
  *
  * 여기서는 시각을 아예 버리고 '달력일'끼리만 뺀다.
  * 로컬 연·월·일을 Date.UTC 로 옮겨 계산하므로 서머타임이 있는 지역에서도
@@ -17,13 +16,16 @@
  */
 import { useEffect, useState } from 'react'
 
-/** 예식: 2027년 9월 4일(토) 12:30 — 루트 index.html · wedding.html 과 동일 */
+/**
+ * 예식: 2027년 9월 4일(토) 11:00 — 루트 index.html · wedding.html 과 동일.
+ * 계약서 원본 시간이며 2026-08-09 에 이 시간으로 확정했다.
+ */
 export const CEREMONY = {
   year: 2027,
   month: 9,
   day: 4,
-  hour: 12,
-  minute: 30,
+  hour: 11,
+  minute: 0,
   place: 'CA웨딩컨벤션 2F 루체홀',
 } as const
 
@@ -76,7 +78,7 @@ export const formatDue = (days: number): string => {
   return days > 0 ? `D-${days}` : `${-days}일 지남`
 }
 
-/** 2027년 9월 4일 토요일 12:30 */
+/** 2027년 9월 4일 토요일 11:00 */
 export const ceremonyLabel = (): string => {
   const { year, month, day, hour, minute } = CEREMONY
   const weekday = KO_WEEKDAY[new Date(year, month - 1, day).getDay()]
