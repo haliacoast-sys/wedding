@@ -18,7 +18,7 @@ import { useMemo } from 'react'
 import type { ReactElement, ReactNode } from 'react'
 import type { TabKey } from './AppShell'
 import { CEREMONY, ceremonyLabel, daysToCeremony, formatDday, formatDue, shortDate, useTodayKey } from './dday'
-import { formatWon, formatWonSigned, percent } from './format'
+import { formatWon, percent } from './format'
 import { toMessage } from './homeApi'
 import type { DueItem } from './homeData'
 import { summarizeBudget, summarizeTasks, useHomeBudgetQuery, useHomeTasksQuery } from './homeData'
@@ -117,83 +117,28 @@ export function HomeScreen(props: { onNavigate: (key: TabKey) => void }): ReactE
     <div className="wrap hm">
       <h1 className="hm-sr">결혼 준비 홈</h1>
 
-      {/* ── D-day. 루트 index.html 의 .dday 카드를 승계했다. ── */}
-      <section className="hm-hero">
-        <p className="hm-hero__eyebrow">
-          {CEREMONY.year} · {String(CEREMONY.month).padStart(2, '0')} ·{' '}
-          {String(CEREMONY.day).padStart(2, '0')}
-        </p>
+      {/* ── D-day 배너.
+          예전에는 연월일·D-day·요일시각·장소를 네 줄로 쌓아 화면의 3분의 1을 썼다.
+          매일 보는 화면에서 바뀌는 값은 D-day 하나뿐이라 나머지는 한 줄로 붙인다. ── */}
+      <section className="hm-hero hm-hero--slim">
         <p className="hm-hero__n">{formatDday(left)}</p>
-        <p className="hm-hero__l">{ceremonyLabel()}</p>
-        <p className="hm-hero__where">{CEREMONY.place}</p>
+        <p className="hm-hero__l">
+          {ceremonyLabel()} · {CEREMONY.place}
+        </p>
       </section>
 
-      {/* ── 진행률 ── */}
+      {/* ── 지금 할 일 ──
+          홈의 존재 이유다. 예전에는 진행률 카드가 먼저 나오고 할 일이 그 아래였는데,
+          "1% 완료"는 알아도 할 일이 없고 "내일 마감"은 알면 오늘 움직이게 된다.
+          진행률은 별도 카드를 없애고 이 카드 아래 한 줄로 붙였다.
+          카테고리별 막대 12줄은 뺐다 — 어느 카테고리를 왜 보여주는지 기준이 없었고
+          자리만 크게 먹었다. 카테고리별 현황은 체크리스트 화면에서 필터로 본다. */}
       <Card
-        title="준비 진행률"
+        title="지금 할 일"
         to="checklist"
         linkLabel="체크리스트 화면 열기"
         onNavigate={onNavigate}
-        minHeight={132}
-      >
-        {tasksQuery.isPending && <Skeleton lines={3} />}
-        {tasksQuery.isError && (
-          <Failed error={tasksQuery.error} onRetry={() => void tasksQuery.refetch()} />
-        )}
-        {tasks?.total === 0 && <p className="hm-empty">아직 등록된 항목이 없습니다.</p>}
-        {tasks && tasks.total > 0 && (
-          <>
-            <p className="hm-statline">
-              <span className="hm-stat">{ratio}</span>
-              <span className="hm-stat__unit">%</span>
-              <span className="hm-statline__side">
-                {tasks.total.toLocaleString('ko-KR')}개 중 {tasks.done.toLocaleString('ko-KR')}개
-                완료
-              </span>
-            </p>
-            <div
-              className="hm-bar"
-              role="progressbar"
-              aria-valuemin={0}
-              aria-valuemax={tasks.total}
-              aria-valuenow={tasks.done}
-              aria-valuetext={`${tasks.total}개 중 ${tasks.done}개 완료 (${ratio}%)`}
-            >
-              <div
-                className={ratio >= 100 ? 'hm-bar__fill hm-bar__fill--done' : 'hm-bar__fill'}
-                style={{ width: `${ratio}%` }}
-              />
-            </div>
-
-            {tasks.categories.length > 0 && (
-              <ul className="hm-cats">
-                {tasks.categories.map((c) => (
-                  <li key={c.category} className="hm-cat">
-                    <span className="hm-cat__name">{c.category}</span>
-                    <span className="hm-cat__track" aria-hidden="true">
-                      <span
-                        className="hm-cat__fill"
-                        style={{ width: `${percent(c.done, c.total)}%` }}
-                      />
-                    </span>
-                    <span className="hm-cat__n">
-                      {c.done}/{c.total}
-                    </span>
-                  </li>
-                ))}
-              </ul>
-            )}
-          </>
-        )}
-      </Card>
-
-      {/* ── 임박 · 지연 ── */}
-      <Card
-        title="임박 · 지연"
-        to="checklist"
-        linkLabel="체크리스트 화면 열기"
-        onNavigate={onNavigate}
-        minHeight={168}
+        minHeight={180}
       >
         {tasksQuery.isPending && <Skeleton lines={4} />}
         {tasksQuery.isError && (
@@ -215,33 +160,53 @@ export function HomeScreen(props: { onNavigate: (key: TabKey) => void }): ReactE
               </div>
             )}
 
-            <div className="hm-sec">
-              <p className="hm-sec__h">다가오는 마감</p>
-              {tasks.upcoming.length > 0 ? (
-                <ul className="hm-list">
-                  {tasks.upcoming.map((item) => (
-                    <DueRow key={item.id} item={item} />
-                  ))}
-                </ul>
-              ) : (
+            {tasks.upcoming.length > 0 ? (
+              <ul className="hm-list">
+                {tasks.upcoming.map((item) => (
+                  <DueRow key={item.id} item={item} />
+                ))}
+              </ul>
+            ) : (
+              tasks.overdueCount === 0 && (
                 <p className="hm-empty">마감일이 잡힌 미완료 항목이 없습니다.</p>
-              )}
-            </div>
+              )
+            )}
 
-            {tasks.noDue > 0 && (
-              <p className="hm-foot">기한 미정 {tasks.noDue.toLocaleString('ko-KR')}건</p>
+            {tasks.total > 0 && (
+              <div className="hm-progline">
+                <div
+                  className="hm-bar"
+                  role="progressbar"
+                  aria-valuemin={0}
+                  aria-valuemax={tasks.total}
+                  aria-valuenow={tasks.done}
+                  aria-valuetext={`${tasks.total}개 중 ${tasks.done}개 완료 (${ratio}%)`}
+                >
+                  <div
+                    className={ratio >= 100 ? 'hm-bar__fill hm-bar__fill--done' : 'hm-bar__fill'}
+                    style={{ width: `${ratio}%` }}
+                  />
+                </div>
+                <span className="hm-progline__n">
+                  {tasks.done}/{tasks.total} · {ratio}%
+                  {tasks.noDue > 0 && ` · 기한 미정 ${tasks.noDue}건`}
+                </span>
+              </div>
             )}
           </>
         )}
       </Card>
 
-      {/* ── 예산 ── */}
+      {/* ── 예산 ──
+          총액이 아니라 자금 출처를 먼저 보여준다. 총 2천만원 중 대부분은 예식 당일
+          축의금으로 정산되는 홀 청구분이라, 총액만 보면 미리 마련해야 할 현금을
+          몇 배로 오해하게 된다. */}
       <Card
         title="예산"
         to="budget"
         linkLabel="가계부 화면 열기"
         onNavigate={onNavigate}
-        minHeight={124}
+        minHeight={116}
       >
         {budgetQuery.isPending && <Skeleton lines={2} />}
         {budgetQuery.isError && (
@@ -251,40 +216,28 @@ export function HomeScreen(props: { onNavigate: (key: TabKey) => void }): ReactE
         {budget && budget.count > 0 && (
           <>
             <p className="hm-statline">
-              <span className="hm-stat hm-stat--won">{formatWon(budget.estimate)}</span>
-              <span className="hm-statline__side">견적 합계</span>
+              <span className="hm-stat hm-stat--won">{formatWon(budget.ownCashRemaining)}</span>
+              <span className="hm-statline__side">예식 전 낼 돈</span>
             </p>
             <dl className="hm-kv">
-              <dt>실제 지출</dt>
-              <dd>{formatWon(budget.actual)}</dd>
-              <dt>견적 대비</dt>
-              <dd className={budget.diff > 0 ? 'hm-over' : budget.diff < 0 ? 'hm-under' : undefined}>
-                {formatWonSigned(budget.diff)}
-              </dd>
-              <dt>항목</dt>
-              <dd>
-                {budget.count.toLocaleString('ko-KR')}건 중 {budget.settled.toLocaleString('ko-KR')}
-                건 실제 입력
-              </dd>
+              <dt>축의금 충당</dt>
+              <dd className="hm-gift">{formatWon(budget.giftMoney)}</dd>
+              <dt>총액</dt>
+              <dd>{formatWon(budget.estimate)}</dd>
             </dl>
           </>
         )}
       </Card>
 
-      {/* ── 당일 ──
-          day_of_* 테이블은 아직 database.types.ts 에 반영되지 않아 여기서 조회하지 않는다.
-          숫자를 억지로 붙이는 대신 입구만 둔다. */}
+      {/* ── 당일 ── 예식까지 1년 넘게 남은 지금은 입구 역할이면 충분하다. */}
       <Card
         title="본식 당일"
         to="dayof"
         linkLabel="당일 화면 열기"
         onNavigate={onNavigate}
-        minHeight={54}
+        minHeight={28}
       >
-        <p className="hm-line">
-          예식 {CEREMONY.hour}:{String(CEREMONY.minute).padStart(2, '0')} · {CEREMONY.place}
-        </p>
-        <p className="hm-empty">진행 순서 · 역할 · 준비물을 확인하세요.</p>
+        <p className="hm-line">진행 순서 · 역할 분담 · 당일 준비물</p>
       </Card>
     </div>
   )

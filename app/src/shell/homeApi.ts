@@ -33,6 +33,9 @@ export type HomeBudgetRow = {
   category: string | null
   estimate: number | null
   actual: number | null
+  /** 선지출 = 예식 전에 우리 현금이 나간다. 축의금 = 예식 당일 축의금으로 정산한다. */
+  funding: '선지출' | '축의금'
+  paid_at: string | null
 }
 
 /** PostgrestError 든 네트워크 예외든 화면에 띄울 수 있는 한 줄로 만든다. */
@@ -55,7 +58,7 @@ export const fetchHomeTasks = async (): Promise<HomeTask[]> => {
 export const fetchHomeBudget = async (): Promise<HomeBudgetRow[]> => {
   const { data, error } = await supabase
     .from('budget_items')
-    .select('id,label,category,estimate,actual')
+    .select('id,label,category,estimate,actual,funding,paid_at')
   if (error) throw new Error(error.message)
   return data ?? []
 }

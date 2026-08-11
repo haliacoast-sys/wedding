@@ -136,12 +136,22 @@ export type BudgetSummary = {
   settled: number
   /** 실제 − 견적. 양수면 예산 초과. */
   diff: number
+  /**
+   * 예식 전에 우리 현금으로 내야 하는 금액 중 아직 결제하지 않은 것.
+   * 홈에서 가장 급한 숫자다 — 총액 대부분은 축의금으로 정산되는 홀 청구분이라
+   * 총액만 보면 실제로 마련해야 할 돈을 크게 오해한다.
+   */
+  ownCashRemaining: number
+  /** 예식 당일 축의금으로 정산할 금액 */
+  giftMoney: number
 }
 
 export const summarizeBudget = (rows: HomeBudgetRow[]): BudgetSummary => {
   let estimate = 0
   let actual = 0
   let settled = 0
+  let ownCashRemaining = 0
+  let giftMoney = 0
 
   for (const row of rows) {
     if (typeof row.estimate === 'number') estimate += row.estimate
@@ -149,7 +159,23 @@ export const summarizeBudget = (rows: HomeBudgetRow[]): BudgetSummary => {
       actual += row.actual
       settled += 1
     }
+
+    // 실제가 적혔으면 실제로, 아니면 견적으로 잡는다. 가계부 화면과 같은 규칙이다.
+    const eff = row.actual ?? row.estimate ?? 0
+    if (row.funding === '축의금') {
+      giftMoney += eff
+    } else if (!row.paid_at) {
+      ownCashRemaining += eff
+    }
   }
 
-  return { count: rows.length, estimate, actual, settled, diff: actual - estimate }
+  return {
+    count: rows.length,
+    estimate,
+    actual,
+    settled,
+    diff: actual - estimate,
+    ownCashRemaining,
+    giftMoney,
+  }
 }
