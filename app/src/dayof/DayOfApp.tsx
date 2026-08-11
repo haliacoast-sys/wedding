@@ -91,18 +91,15 @@ export const DayOfApp = () => {
 
   return (
     <div className="dof-app">
-      <header className="dof-hero">
-        <div className="dof-hero__row">
-          <div>
-            <div className="dof-hero__eyebrow">Wedding Day</div>
-            <h1 className="dof-hero__title">본식 당일</h1>
-          </div>
-          <LiveDot state={realtime} />
-        </div>
+      {/* 제목("본식 당일")과 eyebrow("Wedding Day")를 뺐다. 하단 네비가 이미 "당일"이라고
+          말하고 있어 중복이고, 셋을 세로로 쌓으면 폰 화면의 절반을 머리말이 먹는다.
+          실제로 필요한 정보는 예식 시각 한 줄뿐이다. */}
+      <header className="dof-hero dof-hero--compact">
         <div className="dof-hero__when">
           <b>{ceremonyTime ?? '--:--'}</b>
           <span>{ceremonyDate ?? '기준 시각 미설정'}</span>
         </div>
+        <LiveDot state={realtime} />
       </header>
 
       <div className="dof-sticky">

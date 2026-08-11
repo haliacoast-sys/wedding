@@ -184,15 +184,9 @@ export const BudgetApp = () => {
 
   return (
     <div className="bd-app">
-      <header className="bd-head">
-        <h1 className="bd-head__title">예산</h1>
-        <p className="bd-head__sub">
-          견적을 먼저 적고, 결제하면 실제 금액과 결제일을 채웁니다. 두 사람 화면에 실시간으로
-          공유됩니다.
-        </p>
-      </header>
-
-      {/* 제목 다음에 둔다. 제목이 스크롤로 밀려 올라가면 이 줄이 화면 맨 위에 붙는다. */}
+      {/* 제목과 설명문을 두지 않는다. 하단 네비가 이미 "가계부"라고 말하고 있고,
+          사용법 설명은 처음 한 번만 필요한데 화면 상단을 영구히 차지한다.
+          폰에서는 첫 화면에 실제 항목이 보이는 것이 훨씬 중요하다. */}
       {rows.length > 0 && <TotalsStrip totals={totals} live={live} />}
 
       {body()}

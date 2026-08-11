@@ -60,6 +60,22 @@
   border-bottom: 1px solid var(--hair);
 }
 
+/* 제목 없이 예식 시각 한 줄만 두는 형태. 시각과 실시간 표시를 같은 줄에 놓아
+   머리말이 차지하던 세로 공간을 3분의 1로 줄인다. */
+.dof-hero--compact {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: calc(12px + var(--safe-top, 0px)) 0 10px;
+}
+.dof-hero--compact .dof-hero__when {
+  margin-top: 0;
+}
+.dof-hero--compact .dof-hero__when b {
+  font-size: 24px;
+}
+
 .dof-hero__row {
   display: flex;
   align-items: flex-start;

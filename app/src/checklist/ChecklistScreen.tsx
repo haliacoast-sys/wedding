@@ -150,34 +150,32 @@ export const ChecklistScreen = ({ displayName }: { displayName: string }) => {
         </div>
       </div>
 
-      <section className="ck-card" aria-label="진행률">
-        <div className="ck-card__head">
-          <span className="ck-card__title">
-            {filters.category === 'all' ? '전체 진행률' : `${filters.category} 진행률`}
-            {filters.assignee !== 'all' && (
-              <span className="ck-card__sub">
-                {' '}
-                ·{' '}
-                {filters.assignee === 'none' ? '담당자 미지정' : filters.assignee}
-              </span>
-            )}
-          </span>
-          <span className="ck-live" data-state={realtime} title="Supabase Realtime 구독 상태">
-            <span className="ck-live__dot" />
-            {REALTIME_LABEL[realtime]}
-          </span>
+      {/* 진행률을 카드가 아니라 얇은 한 줄로 둔다. 카드 껍데기(패딩 16px·테두리·배경)는
+          숫자 두 개와 막대 하나를 담는 대가로 폰 화면을 100px 넘게 먹는다.
+          실시간 표시도 글자를 빼고 점만 남긴다 — 상태는 색으로 충분히 전달된다. */}
+      <div className="ck-progress">
+        <Meter
+          progress={overall}
+          label={filters.category === 'all' ? '완료' : filters.category}
+        />
+        <span
+          className="ck-live ck-live--dot-only"
+          data-state={realtime}
+          title={`실시간 동기화: ${REALTIME_LABEL[realtime]}`}
+        >
+          <span className="ck-live__dot" />
+        </span>
+      </div>
+
+      {overdue > 0 && (
+        <div className="ck-callout ck-callout--crit">
+          마감이 지난 미완료 <b>{overdue}건</b> — 목록에 붉은 띠로 표시했습니다.
         </div>
+      )}
 
-        <Meter progress={overall} label="완료" />
-
-        {overdue > 0 && (
-          <div className="ck-callout ck-callout--crit">
-            마감이 지났는데 아직 안 끝난 항목이 <b>{overdue}건</b> 있습니다. 목록에서 붉은
-            띠로 표시했습니다.
-          </div>
-        )}
-      </section>
-
+      {/* 담당자 필터와 추가 버튼을 한 줄에 둔다. 예전에는 담당자 칩 줄, 개수 표시 줄,
+          추가 버튼 줄이 각각 한 줄씩이라 실제 목록이 그만큼 아래로 밀렸다.
+          개수는 위 진행률 줄이 이미 말해 주므로 따로 적지 않는다. */}
       <div className="ck-controls">
         <div className="ck-chiprow" role="group" aria-label="담당자 필터">
           {ASSIGNEE_FILTERS.map((f) => (
@@ -197,16 +195,14 @@ export const ChecklistScreen = ({ displayName }: { displayName: string }) => {
             완료 숨기기
           </Chip>
         </div>
-      </div>
-
-      <div className="ck-controls">
-        <span className="ck-card__sub">
-          {shownCount}개 표시
-          {filters.hideDone && overall.done > 0 ? ` · 완료 ${overall.done}개 숨김` : ''}
-        </span>
-        <span className="ck-controls__spacer" />
-        <button type="button" className="ck-addbtn" onClick={openCreate} disabled={busy}>
-          + 항목 추가
+        <button
+          type="button"
+          className="ck-addbtn"
+          onClick={openCreate}
+          disabled={busy}
+          aria-label={`항목 추가 (현재 ${shownCount}개 표시)`}
+        >
+          + 추가
         </button>
       </div>
 
