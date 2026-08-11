@@ -28,19 +28,20 @@ export const TotalsStrip = ({ totals, live }: TotalsStripProps) => {
   return (
     <div className="bd-strip">
       <div className="bd-strip__row">
+        {/* 맨 위에는 총액이 아니라 "우리가 실제로 마련해야 하는 돈"을 둔다.
+            총액 2천만원 중 대부분은 예식 당일 축의금으로 정산되는 홀 청구분이라,
+            둘을 섞어 보면 필요한 현금을 크게 오해하게 된다. */}
         <div className="bd-strip__cell">
-          <span className="bd-k">총 견적</span>
-          <span className="bd-v">{formatWon(totals.estimateTotal)}</span>
+          <span className="bd-k">예식 전 낼 돈</span>
+          <span className="bd-v">{formatWon(totals.ownCashRemaining)}</span>
         </div>
         <div className="bd-strip__cell">
-          <span className="bd-k">실제 지출</span>
-          <span className="bd-v">{formatWon(totals.actualTotal)}</span>
+          <span className="bd-k">축의금 충당</span>
+          <span className="bd-v bd-v--gift">{formatWon(totals.giftMoney)}</span>
         </div>
         <div className="bd-strip__cell">
-          <span className="bd-k">차액</span>
-          <span className={diffTone(totals.diff)}>
-            {totals.diffCount === 0 ? '—' : formatSignedWon(totals.diff)}
-          </span>
+          <span className="bd-k">총액</span>
+          <span className="bd-v">{formatWon(totals.projected)}</span>
         </div>
         <span
           className={`bd-live bd-live--${live}`}

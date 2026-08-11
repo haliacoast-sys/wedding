@@ -76,6 +76,9 @@ const materialize = (row: ItemInsertRow): BudgetItem => {
     // 되살리기의 경우에도 서버 왕복 후 원래 값이 돌아온다.
     market_avg: row.market_avg ?? null,
     market_note: row.market_note ?? null,
+    // 새 항목은 기본이 선지출이다. 축의금 정산 대상은 홀 청구분뿐이라
+    // 사용자가 직접 만드는 항목은 거의 전부 우리 돈으로 나간다.
+    funding: row.funding ?? '선지출',
     // 되살리기(삭제 취소)는 원래 created_at 을 그대로 넘긴다. 그래야 목록에서
     // 지우기 전 자리로 돌아온다. 새로 만들 때는 지금 시각.
     created_at: row.created_at ?? now,

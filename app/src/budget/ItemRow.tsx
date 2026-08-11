@@ -34,6 +34,9 @@ export const ItemRow = ({ item, vendorName, expanded, onToggle }: ItemRowProps) 
       <span className="bd-row__main">
         <span className="bd-row__label">{item.label}</span>
         <span className="bd-row__meta">
+          {/* 축의금으로 정산되는 항목은 우리 지갑에서 나가는 돈이 아니다.
+              같은 목록에 섞여 있으므로 한눈에 갈리도록 표시한다. */}
+          {item.funding === '축의금' && <span className="bd-tag bd-tag--gift">축의금</span>}
           {item.category?.trim() && <span className="bd-tag">{item.category.trim()}</span>}
           {vendorName && <span className="bd-row__vendor">{vendorName}</span>}
           {item.paid_at ? (

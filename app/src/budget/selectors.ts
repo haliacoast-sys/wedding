@@ -34,6 +34,15 @@ export type Totals = {
   diffCount: number
   /** 견적도 실제도 없는 항목 수. 합계에 0원으로 들어가 있으므로 따로 알려 줘야 한다. */
   unpricedCount: number
+  /**
+   * 자금 출처별 분리. 총액보다 이쪽이 급한 숫자다 —
+   * 웨딩홀 청구분은 예식 당일 축의금으로 정산하지만, 외부 업체는 예식 전에
+   * 우리 현금이 먼저 나간다. 둘을 섞어 보면 실제로 마련해야 할 돈을 알 수 없다.
+   */
+  ownCash: number
+  /** 선지출 중 아직 결제하지 않은 금액. 앞으로 실제로 준비해야 하는 현금이다. */
+  ownCashRemaining: number
+  giftMoney: number
 }
 
 /** 그 항목이 지금 시점에 '얼마짜리'인지. 실제가 있으면 실제, 없으면 견적. */
@@ -52,6 +61,9 @@ export const totalsOf = (items: BudgetItem[]): Totals => {
     diff: 0,
     diffCount: 0,
     unpricedCount: 0,
+    ownCash: 0,
+    ownCashRemaining: 0,
+    giftMoney: 0,
   }
 
   for (const item of items) {
@@ -68,6 +80,14 @@ export const totalsOf = (items: BudgetItem[]): Totals => {
     } else {
       t.unpaid += eff
       t.unpaidCount += 1
+    }
+
+    if (item.funding === '축의금') {
+      t.giftMoney += eff
+    } else {
+      t.ownCash += eff
+      // 이미 결제한 것은 앞으로 마련할 돈이 아니다.
+      if (!item.paid_at) t.ownCashRemaining += eff
     }
 
     if (item.actual != null && item.estimate != null) {

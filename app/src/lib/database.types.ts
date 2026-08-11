@@ -60,6 +60,7 @@ export type Database = {
           category: string | null
           created_at: string
           estimate: number | null
+          funding: Database["public"]["Enums"]["funding_source"]
           id: string
           label: string
           market_avg: number | null
@@ -74,6 +75,7 @@ export type Database = {
           category?: string | null
           created_at?: string
           estimate?: number | null
+          funding?: Database["public"]["Enums"]["funding_source"]
           id?: string
           label: string
           market_avg?: number | null
@@ -88,6 +90,7 @@ export type Database = {
           category?: string | null
           created_at?: string
           estimate?: number | null
+          funding?: Database["public"]["Enums"]["funding_source"]
           id?: string
           label?: string
           market_avg?: number | null
@@ -414,6 +417,7 @@ export type Database = {
     Enums: {
       assignee: "주호" | "지영" | "같이"
       day_of_phase: "준비" | "접수" | "예식" | "촬영" | "연회" | "마무리"
+      funding_source: "선지출" | "축의금"
       task_status: "todo" | "doing" | "done" | "hold"
       wedding_side: "신랑" | "신부" | "공통"
     }
@@ -548,6 +552,7 @@ export const Constants = {
     Enums: {
       assignee: ["주호", "지영", "같이"],
       day_of_phase: ["준비", "접수", "예식", "촬영", "연회", "마무리"],
+      funding_source: ["선지출", "축의금"],
       task_status: ["todo", "doing", "done", "hold"],
       wedding_side: ["신랑", "신부", "공통"],
     },

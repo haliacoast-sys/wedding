@@ -767,6 +767,17 @@
   white-space: nowrap;
 }
 
+/* 축의금으로 정산되는 항목 표시. 우리 지갑에서 나가는 돈과 색으로 갈라 둔다. */
+.bd-tag--gift {
+  background: color-mix(in srgb, var(--s1) 14%, transparent);
+  color: var(--s1);
+  border-color: transparent;
+  font-weight: 700;
+}
+.bd-v--gift {
+  color: var(--s1);
+}
+
 /* ── 시세 근거 (읽기 전용) ── */
 .bd-market {
   margin: 10px 0 2px;
