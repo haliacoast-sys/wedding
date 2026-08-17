@@ -1,9 +1,9 @@
 /**
  * AppShell.tsx — 앱의 껍데기. 얇은 상단 헤더 + 하단 고정 네비게이션.
  *
- * 이 파일이 아는 것은 '탭 4개'와 '지금 어느 탭인가' 뿐이다.
+ * 이 파일이 아는 것은 '탭 다섯 개'와 '지금 어느 탭인가' 뿐이다.
  * 각 탭에 무엇을 그릴지는 children 으로 받는다. 그래서 여기서
- * checklist/budget/dayof 폴더를 import 하지 않는다(그 폴더들은 다른 사람이 만든다).
+ * checklist/budget/guests/dayof 폴더를 import 하지 않는다(그 폴더들은 다른 사람이 만든다).
  *
  * ── 헤더를 fixed/sticky 로 두지 않은 이유 ──────────────────────
  * 다른 화면들이 이미 `position: sticky; top: 0` 인 툴바를 갖고 있다
@@ -15,10 +15,10 @@
  */
 import { useCallback, useEffect, useLayoutEffect, useRef } from 'react'
 import type { ReactElement, ReactNode } from 'react'
-import { BudgetIcon, ChecklistIcon, DayOfIcon, HomeIcon } from './icons'
+import { BudgetIcon, ChecklistIcon, DayOfIcon, GuestsIcon, HomeIcon } from './icons'
 import './shell.css'
 
-export type TabKey = 'home' | 'checklist' | 'budget' | 'dayof'
+export type TabKey = 'home' | 'checklist' | 'budget' | 'guests' | 'dayof'
 
 type TabDef = {
   key: TabKey
@@ -26,10 +26,23 @@ type TabDef = {
   Icon: (props: { active?: boolean }) => ReactElement
 }
 
+/**
+ * 순서는 '지금 얼마나 자주 여는가' 순이고, 뒤로 갈수록 예식일에 가까워진다.
+ *
+ *   홈        매번 처음 보는 화면이라 고정 1번.
+ *   체크리스트 준비 기간 내내 매일 여는 화면.
+ *   가계부     계약·결제가 붙을 때마다 연다. 체크리스트 다음으로 잦다.
+ *   하객       명단은 지금부터 쌓지만 실제로 붙어 있게 되는 건 청첩장 이후다.
+ *   당일       예식 당일에만 쓴다. 그래서 맨 끝.
+ *
+ * 하객을 당일 앞에 끼워 넣은 덕에 기존 세 탭의 위치가 그대로 유지된다.
+ * 이미 손가락이 기억하고 있는 자리를 흔들지 않는 편이 낫다.
+ */
 const TABS: TabDef[] = [
   { key: 'home', label: '홈', Icon: HomeIcon },
   { key: 'checklist', label: '체크리스트', Icon: ChecklistIcon },
   { key: 'budget', label: '가계부', Icon: BudgetIcon },
+  { key: 'guests', label: '하객', Icon: GuestsIcon },
   { key: 'dayof', label: '당일', Icon: DayOfIcon },
 ]
 

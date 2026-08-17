@@ -1,0 +1,1477 @@
+/* ============================================================
+   guests.css — 하객 명단 화면 전용 스타일
+
+   규칙
+   1. 색은 전부 tokens.css 의 변수에서 나온다. 하드코딩된 색상값은 없다.
+      배경 워시가 필요한 곳은 color-mix() 로 토큰에서 만들어 쓴다.
+      (--s1-wash 같은 파생 토큰은 계약에 없으므로 의존하지 않는다.)
+   2. 클래스는 전부 gs- 접두어. index.css 의 공용 .card/.pill/.tab 이나
+      다른 화면의 ck- / bd- / dof- 와 겹치지 않게 한다.
+   3. 하단 고정 요소를 만들지 않는다. 셸이 약 58px + safe-area 네비게이션을 깐다.
+      대신 .gs-app 하단에 그만큼 여백을 준다.
+   4. 터치 타겟 최소 44px(--gs-tap). 입력은 16px 이상(iOS 확대 방지).
+   5. body 를 가로로 흔들지 않는다. 넓은 표는 .gs-tablewrap 안에서만 스크롤한다.
+   ============================================================ */
+
+.gs-app {
+  --gs-tap: 44px;
+  /* 셸이 까는 하단 고정 네비게이션 높이(약 58px).
+     이 화면만 따로 띄워도 안전하도록 기본값을 갖고 있다.
+
+     ※ 통합 시: 셸의 콘텐츠 래퍼가 이미 네비 높이만큼 여백을 갖고 있다면 여백이
+       두 번 잡힌다. 그때는 이 한 줄만 덮으면 된다.
+         .sh-main .gs-app { --gs-navbar: 0px; } */
+  --gs-navbar: 58px;
+  /* 색 토큰을 '글자'로 쓸 때의 보정판.
+     --ink 를 섞으면 라이트에서는 어두워지고 다크에서는 밝아진다(--ink 가 테마마다 뒤집히므로).
+     비율은 라이트 배경(#fcfcfb)에서 대비 4.5:1 을 넘도록 잡았다 — 11~12px 뱃지 글씨가
+     대부분이라 여기서 통과하면 큰 글자는 자동으로 통과한다.
+       --warn(#fab219)  그대로 쓰면 라이트에서 대비 2 도 안 나온다
+       --s2(#eb6834)    그대로 쓰면 3.1, --s1(#2a78d6) 그대로 쓰면 4.3 으로 아슬아슬하다 */
+  --gs-crit-ink: color-mix(in srgb, var(--crit) 82%, var(--ink));
+  --gs-warn-ink: color-mix(in srgb, var(--warn) 52%, var(--ink));
+  --gs-good-ink: color-mix(in srgb, var(--good) 70%, var(--ink));
+  --gs-s1-ink: color-mix(in srgb, var(--s1) 86%, var(--ink));
+  --gs-s2-ink: color-mix(in srgb, var(--s2) 68%, var(--ink));
+
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 0 14px calc(12px + var(--gs-navbar) + var(--safe-bottom, 0px));
+}
+
+/* 셸 안에서 렌더될 때는 하단 여백을 셸에 양보한다.
+   shell.css 의 .sh-main 이 이미 calc(58px + safe-area + 10px) 를 갖고 있어서,
+   여기서도 같은 여백을 잡으면 명단 끝에 140px 짜리 빈 공간이 생긴다.
+   선택자가 안 맞아 이 규칙이 죽더라도 결과는 '여백이 조금 넉넉함'이라 안전하다. */
+:where(.sh-main) .gs-app {
+  --gs-navbar: 0px;
+}
+
+.gs-app *,
+.gs-app *::before,
+.gs-app *::after {
+  box-sizing: border-box;
+}
+
+/* :where() 로 특정도를 0 으로 만든다. 그냥 `.gs-app button` 으로 쓰면 (0,1,1) 이라
+   뒤에 오는 .gs-addbtn(0,1,0) 의 color 를 이겨서 버튼 글자가 배경색에 묻힌다. */
+:where(.gs-app button) {
+  font-family: inherit;
+  color: inherit;
+  cursor: pointer;
+}
+
+.gs-app :focus-visible,
+.gs-backdrop :focus-visible {
+  outline: 2px solid var(--s1);
+  outline-offset: 2px;
+  border-radius: 8px;
+}
+
+/* ── 머리말 ──────────────────────────────────────────── */
+
+.gs-hero {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: calc(12px + var(--safe-top, 0px)) 0 10px;
+  border-bottom: 1px solid var(--hair);
+  margin-bottom: 12px;
+}
+
+.gs-hero__left {
+  display: flex;
+  align-items: baseline;
+  gap: 9px;
+  flex-wrap: wrap;
+  min-width: 0;
+}
+
+.gs-hero__left b {
+  font-size: 19px;
+  font-weight: 700;
+  letter-spacing: -.02em;
+  font-variant-numeric: tabular-nums;
+}
+
+.gs-hero__left span {
+  font-size: 12.5px;
+  color: var(--ink-2);
+  font-variant-numeric: tabular-nums;
+}
+
+/* ── 카드 ────────────────────────────────────────────── */
+
+.gs-card {
+  background: var(--surface);
+  border: 1px solid var(--hair);
+  border-radius: var(--radius);
+  padding: 15px;
+  margin: 0 0 12px;
+}
+
+.gs-eyebrow {
+  display: block;
+  font-size: 11.5px;
+  font-weight: 700;
+  color: var(--muted);
+  letter-spacing: .04em;
+}
+
+/* 설명문은 --muted 로 두지 않는다. 라이트에서 --muted 는 카드 배경 대비 3.5 밖에
+   안 나오는데, 이 화면의 설명은 "참석 인원 ≠ 식사 인원" 처럼 안 읽히면 계산을
+   틀리게 만드는 내용이다. 눈에 덜 띄게 하는 건 크기로 충분하다. */
+.gs-hint {
+  margin: 10px 0 0;
+  font-size: 12.5px;
+  color: var(--ink-2);
+  line-height: 1.65;
+  overflow-wrap: anywhere;
+}
+
+.gs-hint b {
+  color: var(--ink);
+}
+
+.gs-hint--warn {
+  color: var(--gs-warn-ink);
+}
+
+.gs-hint code,
+.gs-callout code,
+.gs-state code {
+  font-size: 12px;
+  background: var(--surface-2);
+  border-radius: 5px;
+  padding: 1px 5px;
+  overflow-wrap: anywhere;
+}
+
+/* ── 수지 카드 ───────────────────────────────────────── */
+
+.gs-net {
+  border-left: 3px solid var(--s1);
+}
+
+.gs-net__head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.gs-net__basis {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--muted);
+  white-space: nowrap;
+}
+
+.gs-net__amount {
+  display: block;
+  margin-top: 5px;
+  font-size: 30px;
+  font-weight: 700;
+  letter-spacing: -.035em;
+  font-variant-numeric: tabular-nums;
+  line-height: 1.15;
+  overflow-wrap: anywhere;
+}
+
+.gs-net__amount[data-tone='good'] {
+  color: var(--gs-good-ink);
+}
+
+.gs-net__amount[data-tone='crit'] {
+  color: var(--gs-crit-ink);
+}
+
+.gs-net__manwon {
+  margin: 3px 0 0;
+  font-size: 12.5px;
+  color: var(--ink-2);
+  font-variant-numeric: tabular-nums;
+}
+
+.gs-net__split {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 18px;
+  margin-top: 13px;
+  padding-top: 12px;
+  border-top: 1px solid var(--grid);
+}
+
+.gs-net__split > div {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+  flex: 1 1 130px;
+}
+
+/* 이 두 글자가 어떤 금액인지를 말한다(축의금 합계 / 예상 식대). 라벨이라도 --muted 는 쓰지 않는다. */
+.gs-net__split span {
+  font-size: 11.5px;
+  color: var(--ink-2);
+  font-weight: 600;
+}
+
+.gs-net__split b {
+  font-size: 15px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  overflow-wrap: anywhere;
+}
+
+.gs-net__split i {
+  font-style: normal;
+  font-size: 11px;
+  color: var(--ink-2);
+  font-variant-numeric: tabular-nums;
+}
+
+/* ── 줄 머리 (좌: 이름, 우: 값) ──────────────────────── */
+
+.gs-rowhead {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 9px;
+}
+
+.gs-rowhead__value {
+  font-size: 13px;
+  color: var(--ink-2);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.gs-rowhead__value b {
+  font-size: 19px;
+  font-weight: 700;
+  color: var(--ink);
+  letter-spacing: -.02em;
+}
+
+/* ── 막대 ────────────────────────────────────────────── */
+
+.gs-track {
+  display: flex;
+  height: 9px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--ink) 8%, transparent);
+  overflow: hidden;
+}
+
+.gs-fill {
+  height: 100%;
+  background: var(--s1);
+  transition: width .35s cubic-bezier(.2, .7, .3, 1);
+}
+
+.gs-track[data-tone='good'] .gs-fill {
+  background: var(--good);
+}
+
+.gs-track[data-tone='warn'] .gs-fill {
+  background: var(--warn);
+}
+
+.gs-track[data-tone='crit'] .gs-fill {
+  background: var(--crit);
+}
+
+/* 보증인원을 넘긴 부분. 같은 막대 오른쪽에 이어 붙여 '넘쳤다'를 형태로 보여 준다. */
+.gs-fill--over {
+  background: repeating-linear-gradient(
+    45deg,
+    var(--crit) 0 4px,
+    color-mix(in srgb, var(--crit) 55%, var(--surface)) 4px 8px
+  );
+}
+
+/* ── 안내 배너 ───────────────────────────────────────── */
+
+.gs-callout {
+  border-left: 3px solid var(--s1);
+  background: color-mix(in srgb, var(--s1) 9%, transparent);
+  padding: 11px 13px;
+  border-radius: 0 10px 10px 0;
+  font-size: 13px;
+  line-height: 1.65;
+  margin: 11px 0 0;
+  color: var(--ink-2);
+  overflow-wrap: anywhere;
+}
+
+.gs-callout b {
+  color: var(--ink);
+  font-weight: 700;
+}
+
+.gs-callout--crit {
+  border-color: var(--crit);
+  background: color-mix(in srgb, var(--crit) 10%, transparent);
+}
+
+.gs-callout--warn {
+  border-color: var(--warn);
+  background: color-mix(in srgb, var(--warn) 13%, transparent);
+}
+
+/* ── 카드 안의 누를 수 있는 한 줄 ────────────────────── */
+
+.gs-inlinebtn {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  width: 100%;
+  min-height: var(--gs-tap);
+  margin-top: 11px;
+  padding: 8px 12px;
+  text-align: left;
+  border: 1px dashed color-mix(in srgb, var(--ink) 22%, transparent);
+  border-radius: 10px;
+  background: transparent;
+  font-size: 12.5px;
+  line-height: 1.55;
+  color: var(--ink-2);
+}
+
+.gs-inlinebtn b {
+  color: var(--ink);
+}
+
+.gs-inlinebtn__go {
+  flex: 0 0 auto;
+  font-size: 11.5px;
+  font-weight: 700;
+  color: var(--gs-s1-ink);
+  white-space: nowrap;
+}
+
+/* ── 표 ──────────────────────────────────────────────── */
+
+/* 표는 화면보다 넓다. 여기 안에서만 가로로 흐르게 한다(body 는 절대 흔들지 않는다). */
+.gs-tablewrap {
+  margin-top: 10px;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.gs-table {
+  width: 100%;
+  min-width: 420px;
+  border-collapse: collapse;
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
+}
+
+.gs-table th,
+.gs-table td {
+  padding: 8px 9px;
+  text-align: right;
+  white-space: nowrap;
+  border-bottom: 1px solid var(--grid);
+}
+
+.gs-table thead th {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--ink-2);
+  border-bottom: 1.5px solid var(--axis);
+}
+
+.gs-table tbody th[scope='row'],
+.gs-table thead th:first-child {
+  text-align: left;
+  font-weight: 700;
+}
+
+.gs-table tbody tr:last-child th,
+.gs-table tbody tr:last-child td {
+  border-bottom: 0;
+}
+
+.gs-table__sum th,
+.gs-table__sum td {
+  border-top: 1.5px solid var(--axis);
+  font-weight: 700;
+  background: color-mix(in srgb, var(--ink) 4%, transparent);
+}
+
+.gs-table--preview {
+  min-width: 380px;
+}
+
+.gs-table--preview td,
+.gs-table--preview th {
+  text-align: left;
+}
+
+/* ── 검색 · 필터 ─────────────────────────────────────── */
+
+.gs-filters {
+  position: sticky;
+  top: 0;
+  z-index: 30;
+  background: var(--plane);
+  margin: 0 -14px 12px;
+  padding: 8px 14px;
+  border-bottom: 1px solid var(--hair);
+}
+
+.gs-searchrow {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.gs-search {
+  position: relative;
+  flex: 1 1 auto;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+}
+
+.gs-search__icon {
+  position: absolute;
+  left: 11px;
+  display: grid;
+  place-items: center;
+  color: var(--muted);
+  pointer-events: none;
+}
+
+.gs-search__input {
+  width: 100%;
+  min-height: var(--gs-tap);
+  background: var(--surface);
+  border: 1px solid var(--hair);
+  border-radius: 10px;
+  color: var(--ink);
+  font-family: inherit;
+  /* 16px 미만이면 iOS 사파리가 포커스할 때 화면을 확대해 버린다. */
+  font-size: 16px;
+  padding: 0 46px 0 34px;
+}
+
+.gs-search__input::-webkit-search-cancel-button {
+  display: none;
+}
+
+.gs-search__clear {
+  position: absolute;
+  right: 0;
+  width: var(--gs-tap);
+  height: var(--gs-tap);
+  border: 0;
+  background: none;
+  color: var(--muted);
+  font-size: 19px;
+  line-height: 1;
+  border-radius: 8px;
+}
+
+.gs-filterbtn {
+  flex: 0 0 auto;
+  min-height: var(--gs-tap);
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border: 1px solid var(--hair);
+  background: var(--surface);
+  color: var(--ink-2);
+  border-radius: 10px;
+  padding: 0 13px;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.gs-filterbtn[aria-expanded='true'] {
+  background: var(--ink);
+  color: var(--surface);
+  border-color: var(--ink);
+}
+
+/* 버튼의 글자색을 그대로 물려받는다. 이 뱃지는 접힌 상태(밝은 면 + 어두운 글자)와
+   펼친 상태(어두운 면 + 밝은 글자) 양쪽에 올라간다. 고정색을 주면 한쪽에서 묻힌다. */
+.gs-filterbtn__count {
+  min-width: 18px;
+  height: 18px;
+  border-radius: 999px;
+  background: color-mix(in srgb, currentColor 20%, transparent);
+  color: inherit;
+  font-size: 11px;
+  display: grid;
+  place-items: center;
+  padding: 0 4px;
+}
+
+.gs-activefilters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 8px;
+}
+
+.gs-tagbtn {
+  min-height: var(--gs-tap);
+  border-radius: 999px;
+  border: 1px solid color-mix(in srgb, var(--s1) 34%, transparent);
+  background: color-mix(in srgb, var(--s1) 11%, transparent);
+  color: var(--gs-s1-ink);
+  font-size: 12.5px;
+  font-weight: 700;
+  padding: 0 11px;
+}
+
+.gs-filterpanel {
+  margin-top: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+}
+
+.gs-filterpanel__row {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  min-width: 0;
+}
+
+.gs-filterpanel__label {
+  flex: 0 0 52px;
+  font-size: 11.5px;
+  font-weight: 700;
+  color: var(--muted);
+}
+
+.gs-filterpanel__clear {
+  align-self: flex-start;
+}
+
+/* ── 칩 ──────────────────────────────────────────────── */
+
+/* 칩 줄은 좌우로 흐르게 둔다(잘린 칩이 스크롤 가능함을 알린다). */
+.gs-chiprow {
+  display: flex;
+  gap: 6px;
+  overflow-x: auto;
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+  min-width: 0;
+  padding: 1px 0;
+}
+
+.gs-chiprow::-webkit-scrollbar {
+  display: none;
+}
+
+.gs-chiprow__sep {
+  flex: 0 0 auto;
+  width: 1px;
+  align-self: stretch;
+  margin: 6px 3px;
+  background: var(--grid);
+}
+
+.gs-chip {
+  flex: 0 0 auto;
+  min-height: var(--gs-tap);
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border: 1px solid var(--hair);
+  background: var(--surface);
+  color: var(--ink-2);
+  border-radius: 999px;
+  padding: 0 14px;
+  font-size: 13.5px;
+  font-weight: 600;
+  white-space: nowrap;
+  transition: background .15s, color .15s, border-color .15s;
+}
+
+.gs-chip[aria-pressed='true'] {
+  background: var(--ink);
+  color: var(--surface);
+  border-color: var(--ink);
+}
+
+.gs-chip__count {
+  font-size: 11px;
+  font-weight: 700;
+  opacity: .65;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ── 빠른 추가 ───────────────────────────────────────── */
+
+.gs-quickadd {
+  background: var(--surface);
+  border: 1px solid var(--hair);
+  border-radius: var(--radius);
+  padding: 12px;
+  margin: 0 0 12px;
+}
+
+.gs-quickadd__row {
+  display: flex;
+  gap: 8px;
+}
+
+.gs-quickadd__input {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.gs-addbtn {
+  flex: 0 0 auto;
+  min-height: var(--gs-tap);
+  border: 1px solid var(--ink);
+  background: var(--ink);
+  color: var(--surface);
+  border-radius: 10px;
+  padding: 0 18px;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.gs-addbtn:disabled {
+  opacity: .45;
+  cursor: default;
+}
+
+.gs-quickadd__dup {
+  margin: 8px 0 0;
+  font-size: 12px;
+  line-height: 1.55;
+  color: var(--gs-warn-ink);
+}
+
+.gs-quickadd__opts {
+  margin-top: 9px;
+  min-width: 0;
+}
+
+.gs-quickadd__foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-top: 8px;
+  min-width: 0;
+}
+
+/* 대량 입력으로 가는 유일한 입구다. 부차적으로 생겼어도 타겟은 44px 를 지킨다. */
+.gs-linkbtn {
+  border: 0;
+  background: none;
+  padding: 6px 0;
+  min-height: var(--gs-tap);
+  font-size: 12.5px;
+  font-weight: 700;
+  color: var(--gs-s1-ink);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.gs-quickadd__added {
+  font-size: 11.5px;
+  color: var(--muted);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  min-width: 0;
+}
+
+/* ── 부분합 ──────────────────────────────────────────── */
+
+.gs-subtotal {
+  margin: 0 0 10px;
+  padding: 9px 12px;
+  border-radius: 10px;
+  background: var(--surface-2);
+  font-size: 12.5px;
+  color: var(--ink-2);
+  font-variant-numeric: tabular-nums;
+  line-height: 1.5;
+}
+
+/* ── 그룹 · 목록 ─────────────────────────────────────── */
+
+.gs-group {
+  margin: 0 0 16px;
+}
+
+.gs-grouphead {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 10px;
+  margin: 0 0 7px;
+  min-width: 0;
+}
+
+.gs-grouphead h3 {
+  font-size: 14px;
+  font-weight: 700;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+/* 그룹 머리의 숫자는 장식이 아니라 내용이다(건수·참석 인원·축의금).
+   --muted 는 카드(--surface) 위에서는 4.85 지만 페이지 바탕(--plane) 위에서는 3.6 까지
+   떨어진다. 이 줄은 바탕 위에 바로 놓이므로 --ink-2 를 쓴다. */
+.gs-grouphead__count {
+  flex: 0 0 auto;
+  font-size: 11.5px;
+  color: var(--ink-2);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.gs-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  border: 1px solid var(--hair);
+  border-radius: var(--radius);
+  background: var(--surface);
+  overflow: hidden;
+}
+
+.gs-item {
+  display: flex;
+  align-items: stretch;
+  gap: 0;
+  border-bottom: 1px solid var(--grid);
+  min-width: 0;
+}
+
+.gs-item:last-child {
+  border-bottom: 0;
+}
+
+/* 상태 순환 버튼. 이 화면에서 제일 많이 눌리는 타겟이라 44px 를 꽉 채운다. */
+.gs-cycle {
+  flex: 0 0 auto;
+  width: 58px;
+  min-height: var(--gs-tap);
+  display: grid;
+  place-items: center;
+  border: 0;
+  border-right: 1px solid var(--grid);
+  background: var(--surface-2);
+  color: var(--ink-2);
+  font-size: 11.5px;
+  font-weight: 700;
+  letter-spacing: -.02em;
+  padding: 0 2px;
+  transition: background .12s, color .12s;
+}
+
+.gs-cycle[data-tone='good'] {
+  background: color-mix(in srgb, var(--good) 15%, transparent);
+  color: var(--gs-good-ink);
+}
+
+.gs-cycle[data-tone='warn'] {
+  background: color-mix(in srgb, var(--warn) 20%, transparent);
+  color: var(--gs-warn-ink);
+}
+
+.gs-cycle[data-tone='off'] {
+  background: var(--surface-2);
+  color: var(--ink-2);
+}
+
+.gs-item__body {
+  flex: 1 1 auto;
+  min-width: 0;
+  text-align: left;
+  background: none;
+  border: 0;
+  padding: 9px 10px;
+  min-height: var(--gs-tap);
+  display: block;
+}
+
+.gs-item__title {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+  min-width: 0;
+}
+
+.gs-item__title b {
+  font-size: 14.5px;
+  font-weight: 600;
+  color: var(--ink);
+  overflow-wrap: anywhere;
+}
+
+.gs-item__meta {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  flex-wrap: wrap;
+  margin-top: 5px;
+  min-width: 0;
+}
+
+.gs-item__tel {
+  font-size: 11.5px;
+  color: var(--ink-2);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.gs-item__note {
+  display: block;
+  margin-top: 4px;
+  font-size: 12px;
+  color: var(--ink-2);
+  line-height: 1.55;
+  overflow-wrap: anywhere;
+}
+
+/* 연락처가 없으면 자리만 남기고 흐려 둔다. 행마다 오른쪽 끝 위치가 달라지면
+   엄지가 매번 다시 조준해야 한다. */
+.gs-call {
+  flex: 0 0 auto;
+  width: var(--gs-tap);
+  min-height: var(--gs-tap);
+  display: grid;
+  place-items: center;
+  color: var(--s1);
+  text-decoration: none;
+  border-left: 1px solid var(--grid);
+}
+
+.gs-call--off {
+  color: var(--muted);
+  opacity: .3;
+}
+
+/* ── 뱃지 ────────────────────────────────────────────── */
+
+.gs-badge {
+  display: inline-block;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: 999px;
+  background: var(--surface-2);
+  color: var(--ink-2);
+  border: 1px solid transparent;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+
+.gs-badge--side {
+  background: color-mix(in srgb, var(--s1) 11%, transparent);
+  color: var(--gs-s1-ink);
+}
+
+.gs-badge--count {
+  background: color-mix(in srgb, var(--s2) 13%, transparent);
+  color: var(--gs-s2-ink);
+}
+
+.gs-badge--gift {
+  background: color-mix(in srgb, var(--ink) 8%, transparent);
+  color: var(--ink);
+}
+
+.gs-badge--ok,
+.gs-badge[data-tone='good'] {
+  background: color-mix(in srgb, var(--good) 13%, transparent);
+  color: var(--gs-good-ink);
+}
+
+.gs-badge--pending,
+.gs-badge[data-tone='warn'] {
+  background: color-mix(in srgb, var(--warn) 20%, transparent);
+  color: var(--gs-warn-ink);
+}
+
+.gs-badge--info {
+  background: color-mix(in srgb, var(--s1) 11%, transparent);
+  color: var(--gs-s1-ink);
+}
+
+.gs-badge[data-tone='off'] {
+  background: var(--surface-2);
+  color: var(--muted);
+}
+
+/* ── 상태 화면 (로딩 / 에러 / 빈 목록) ───────────────── */
+
+.gs-state {
+  text-align: left;
+  padding: 18px 16px;
+}
+
+.gs-state h3 {
+  font-size: 16px;
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+
+.gs-state p {
+  margin: 0 0 9px;
+  font-size: 13.5px;
+  color: var(--ink-2);
+  line-height: 1.65;
+}
+
+.gs-state ul {
+  margin: 0 0 10px;
+  padding-left: 18px;
+  font-size: 13.5px;
+  color: var(--ink-2);
+}
+
+.gs-state li {
+  margin: 0 0 6px;
+  line-height: 1.6;
+}
+
+.gs-state__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+/* 빈 상태 안에 들어간 빠른 추가는 카드 안이므로 테두리를 뺀다. */
+.gs-state .gs-quickadd {
+  border: 0;
+  background: var(--surface-2);
+  margin: 12px 0;
+}
+
+.gs-errbox {
+  margin: 10px 0;
+  padding: 10px 12px;
+  border-radius: 10px;
+  background: var(--surface-2);
+  border: 1px solid var(--hair);
+  font-size: 12px;
+  color: var(--ink-2);
+  overflow-wrap: anywhere;
+}
+
+.gs-errbox dt {
+  font-weight: 700;
+  color: var(--muted);
+  font-size: 11px;
+}
+
+.gs-errbox dd {
+  margin: 0 0 6px;
+}
+
+.gs-errbox dd:last-child {
+  margin-bottom: 0;
+}
+
+.gs-skel {
+  height: 58px;
+  border-bottom: 1px solid var(--grid);
+  background: linear-gradient(90deg,
+      transparent 0%,
+      color-mix(in srgb, var(--ink) 4%, transparent) 50%,
+      transparent 100%);
+  background-size: 200% 100%;
+  animation: gs-shimmer 1.2s linear infinite;
+}
+
+.gs-skel:last-child {
+  border-bottom: 0;
+}
+
+@keyframes gs-shimmer {
+  from {
+    background-position: 200% 0;
+  }
+
+  to {
+    background-position: -200% 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+
+  .gs-skel {
+    animation: none;
+  }
+
+  .gs-fill {
+    transition: none;
+  }
+}
+
+/* ── 토스트 ──────────────────────────────────────────── */
+
+/* 하단에는 셸의 고정 네비게이션이 깔린다. 아래에 두면 겹치거나 숨는다. */
+.gs-toast {
+  position: fixed;
+  left: 50%;
+  transform: translateX(-50%);
+  top: calc(10px + var(--safe-top, 0px));
+  z-index: 210;
+  max-width: min(92vw, 540px);
+  background: var(--ink);
+  color: var(--plane);
+  border-radius: 12px;
+  padding: 11px 14px;
+  font-size: 13px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  box-shadow: 0 8px 26px color-mix(in srgb, var(--ink) 28%, transparent);
+}
+
+.gs-toast button {
+  background: none;
+  border: 0;
+  color: inherit;
+  font-size: 12px;
+  font-weight: 700;
+  opacity: .75;
+  padding: 4px;
+}
+
+/* ── 하단 시트 ───────────────────────────────────────── */
+
+/* z-index 를 크게 잡는 이유: 셸의 하단 고정 네비게이션이 이 화면 밖에 있고,
+   그 위를 덮지 못하면 시트 아래쪽의 저장·삭제 버튼이 가려진다. */
+.gs-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  background: color-mix(in srgb, var(--ink) 44%, transparent);
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+}
+
+.gs-sheet {
+  width: 100%;
+  max-width: 720px;
+  max-height: 92vh;
+  overflow-y: auto;
+  background: var(--surface);
+  border: 1px solid var(--hair);
+  border-bottom: 0;
+  border-radius: var(--radius) var(--radius) 0 0;
+  padding: 16px 16px calc(20px + var(--safe-bottom, 0px));
+  animation: gs-rise .18s cubic-bezier(.2, .7, .3, 1);
+  box-sizing: border-box;
+}
+
+.gs-sheet *,
+.gs-sheet *::before,
+.gs-sheet *::after {
+  box-sizing: border-box;
+}
+
+@keyframes gs-rise {
+  from {
+    transform: translateY(14px);
+    opacity: 0;
+  }
+
+  to {
+    transform: none;
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .gs-sheet {
+    animation: none;
+  }
+}
+
+@media (min-width: 560px) {
+  .gs-backdrop {
+    align-items: center;
+    padding: 20px 14px;
+  }
+
+  .gs-sheet {
+    border-radius: var(--radius);
+    border-bottom: 1px solid var(--hair);
+  }
+}
+
+.gs-sheet__head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+
+.gs-sheet__head h2 {
+  font-size: 17px;
+  font-weight: 700;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.gs-sheet__actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 16px;
+  padding-top: 14px;
+  border-top: 1px solid var(--grid);
+}
+
+/* ── 폼 ──────────────────────────────────────────────── */
+
+.gs-field {
+  margin: 0 0 14px;
+}
+
+.gs-field > label {
+  display: block;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--muted);
+  margin-bottom: 6px;
+}
+
+.gs-field__hint {
+  margin: 6px 0 0;
+  font-size: 11.5px;
+  color: var(--ink-2);
+  line-height: 1.6;
+}
+
+.gs-field__hint b {
+  color: var(--ink-2);
+}
+
+.gs-input,
+.gs-textarea {
+  width: 100%;
+  min-height: var(--gs-tap);
+  background: var(--plane);
+  border: 1px solid var(--hair);
+  border-radius: 10px;
+  color: var(--ink);
+  font-family: inherit;
+  /* 16px 미만이면 iOS 사파리가 포커스할 때 화면을 확대해 버린다. */
+  font-size: 16px;
+  padding: 10px 12px;
+}
+
+.gs-input--sub {
+  margin-top: 7px;
+}
+
+.gs-textarea {
+  min-height: 74px;
+  resize: vertical;
+  line-height: 1.55;
+}
+
+.gs-textarea--bulk {
+  min-height: 150px;
+  margin-top: 8px;
+  font-variant-numeric: tabular-nums;
+}
+
+.gs-segment {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.gs-segment--tight {
+  margin-bottom: 2px;
+}
+
+.gs-row2 {
+  display: flex;
+  gap: 8px;
+}
+
+.gs-row2__cell {
+  flex: 1 1 0;
+  min-width: 0;
+  display: block;
+}
+
+.gs-row2__cell > span {
+  display: block;
+  font-size: 11.5px;
+  font-weight: 600;
+  color: var(--muted);
+  margin-bottom: 5px;
+}
+
+.gs-echo {
+  margin: 9px 0 0;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--gs-s1-ink);
+  line-height: 1.55;
+}
+
+/* ── 인원 스테퍼 ─────────────────────────────────────── */
+
+.gs-stepper {
+  display: flex;
+  align-items: stretch;
+  border: 1px solid var(--hair);
+  border-radius: 10px;
+  background: var(--plane);
+  overflow: hidden;
+}
+
+.gs-stepper__btn {
+  flex: 0 0 auto;
+  width: var(--gs-tap);
+  min-height: var(--gs-tap);
+  border: 0;
+  background: var(--surface-2);
+  color: var(--ink);
+  font-size: 19px;
+  line-height: 1;
+  padding: 0;
+}
+
+.gs-stepper__btn:disabled {
+  opacity: .35;
+  cursor: default;
+}
+
+.gs-stepper__input {
+  flex: 1 1 auto;
+  min-width: 0;
+  width: 100%;
+  border: 0;
+  background: transparent;
+  color: var(--ink);
+  font-family: inherit;
+  font-size: 16px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  text-align: center;
+  padding: 0 2px;
+}
+
+.gs-stepper__input:focus {
+  outline: none;
+}
+
+/* ── 금액 입력 ───────────────────────────────────────── */
+
+.gs-moneybox {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.gs-input--money {
+  padding-right: 34px;
+  font-variant-numeric: tabular-nums;
+  font-weight: 700;
+  text-align: right;
+}
+
+.gs-moneybox__unit {
+  position: absolute;
+  right: 12px;
+  font-size: 13px;
+  color: var(--muted);
+  pointer-events: none;
+}
+
+.gs-quickrow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 7px;
+}
+
+.gs-quickbtn {
+  min-height: var(--gs-tap);
+  border: 1px solid var(--hair);
+  background: var(--surface-2);
+  color: var(--ink-2);
+  border-radius: 999px;
+  padding: 0 13px;
+  font-size: 12.5px;
+  font-weight: 700;
+}
+
+.gs-quickbtn--clear {
+  color: var(--muted);
+}
+
+.gs-quickbtn:disabled {
+  opacity: .4;
+  cursor: default;
+}
+
+/* ── 버튼 ────────────────────────────────────────────── */
+
+.gs-btn {
+  min-height: var(--gs-tap);
+  border-radius: 10px;
+  padding: 0 16px;
+  font-size: 14px;
+  font-weight: 700;
+  border: 1px solid var(--hair);
+  background: var(--surface-2);
+  color: var(--ink-2);
+}
+
+.gs-btn--primary {
+  background: var(--ink);
+  border-color: var(--ink);
+  color: var(--surface);
+  flex: 1 1 auto;
+}
+
+.gs-btn--danger {
+  background: color-mix(in srgb, var(--crit) 12%, transparent);
+  border-color: color-mix(in srgb, var(--crit) 30%, transparent);
+  color: var(--gs-crit-ink);
+}
+
+.gs-btn--quiet {
+  background: transparent;
+  border-color: var(--hair);
+  font-size: 12.5px;
+  padding: 0 13px;
+}
+
+.gs-btn:disabled {
+  opacity: .5;
+  cursor: default;
+}
+
+.gs-confirm {
+  margin-top: 14px;
+  padding: 12px 13px;
+  border-radius: 10px;
+  border: 1px solid color-mix(in srgb, var(--crit) 30%, transparent);
+  background: color-mix(in srgb, var(--crit) 8%, transparent);
+}
+
+.gs-confirm p {
+  margin: 0 0 10px;
+  font-size: 13.5px;
+  color: var(--ink);
+  line-height: 1.6;
+}
+
+.gs-confirm__row {
+  display: flex;
+  gap: 8px;
+}
+
+/* ── 붙여넣기 미리보기 ───────────────────────────────── */
+
+.gs-preview {
+  margin-top: 4px;
+  padding: 12px;
+  border-radius: 10px;
+  border: 1px solid var(--hair);
+  background: var(--surface-2);
+}
+
+.gs-preview__head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.gs-preview__head b {
+  font-size: 17px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.gs-preview__head span {
+  font-size: 11.5px;
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.gs-preview__more {
+  margin: 7px 0 0;
+  font-size: 11.5px;
+  color: var(--muted);
+}
+
+/* ── 연결 상태 ───────────────────────────────────────── */
+
+.gs-live {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--muted);
+  white-space: nowrap;
+  flex: 0 0 auto;
+}
+
+.gs-live__dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 999px;
+  background: var(--muted);
+}
+
+.gs-live[data-state='live'] .gs-live__dot {
+  background: var(--good);
+}
+
+.gs-live[data-state='offline'] .gs-live__dot {
+  background: var(--crit);
+}
+
+/* ── 꼬리말 ──────────────────────────────────────────── */
+
+.gs-footnote {
+  margin: 20px 0 0;
+  padding-top: 14px;
+  border-top: 1px solid var(--hair);
+  font-size: 11.5px;
+  /* 같은 이유로 --muted 대신 --ink-2. 이 꼬리말은 참석/식사 인원의 차이를 설명하는
+     실제 내용이라 안 읽히면 그 구분을 영영 모르게 된다. */
+  color: var(--ink-2);
+  line-height: 1.75;
+}
+
+.gs-footnote b {
+  color: var(--ink);
+}
+
+/* ── 기타 ────────────────────────────────────────────── */
+
+.gs-facts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 10px;
+}

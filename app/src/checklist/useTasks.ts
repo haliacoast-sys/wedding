@@ -91,6 +91,9 @@ const materialize = (row: TaskInsert & { id: string }): Task => {
     due_date: row.due_date ?? null,
     assignee: row.assignee ?? null,
     status,
+    // 시기(D-12개월 · D-3주 …)는 엑셀에서 가져온 65건에만 붙어 있는 값이다.
+    // 앱에서 새로 만드는 항목은 마감일로 관리하므로 비워 둔다.
+    phase: row.phase ?? null,
     vendor_id: row.vendor_id ?? null,
     sort_order: row.sort_order ?? 0,
     created_by: row.created_by ?? null,

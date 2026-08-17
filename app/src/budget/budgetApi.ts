@@ -1,12 +1,32 @@
 /**
  * budgetApi.ts — Supabase 호출과 에러 정규화. React 는 여기 들어오지 않는다.
+ *
+ * 읽기와 쓰기의 대상이 다르다.
+ *   읽기 → public.budget_rollup (뷰).  budget_items 의 모든 컬럼에 결제 원장 합계
+ *          (paid_sum · unpaid · payment_count)가 붙어 있다. security_invoker = true 라
+ *          RLS 는 밑의 테이블 정책이 그대로 걸린다.
+ *   쓰기 → public.budget_items (테이블). 뷰에는 쓸 수 없다.
+ *
+ * 그래서 fetchItems 만 뷰를 보고, insert/update/delete 는 전부 테이블을 본다.
+ * 이 비대칭이 이 파일에 갇혀 있어야 위쪽(useBudget · 화면)이 그걸 신경 쓰지 않는다.
  */
 import type { PostgrestError } from '@supabase/supabase-js'
 import { supabase } from '../lib/supabase'
-import type { BudgetItem, BudgetItemUpdate, ItemInsertRow, Vendor, VendorInsert } from './types'
+import { fromRollup } from './types'
+import type {
+  BudgetItemUpdate,
+  BudgetRow,
+  ItemInsertRow,
+  Payment,
+  PaymentInsertRow,
+  PaymentUpdate,
+  Vendor,
+  VendorInsert,
+} from './types'
 
 /** 예산 캐시의 뿌리. 한 곳에 모아야 무효화가 새지 않는다. */
 export const itemsKey = ['budget', 'items'] as const
+export const paymentsKey = ['budget', 'payments'] as const
 export const vendorsKey = ['budget', 'vendors'] as const
 export const membershipKey = ['budget', 'is-member'] as const
 
@@ -48,11 +68,30 @@ export const describeError = (error: unknown): FailureInfo => {
 
 // ── 조회 ──────────────────────────────────────────────────────
 
-export const fetchItems = async (): Promise<BudgetItem[]> => {
-  const { data, error } = await supabase.from('budget_items').select('*')
+/**
+ * 목록은 뷰에서 읽는다. 정렬은 selectors.sortRows 가 맡는다 —
+ * 서버 정렬과 이중으로 두면 낙관적으로 끼워 넣은 행의 위치가 두 규칙 사이에서 흔들린다.
+ */
+export const fetchItems = async (): Promise<BudgetRow[]> => {
+  const { data, error } = await supabase.from('budget_rollup').select('*')
   if (error) throw toFailure(error)
-  // 정렬은 selectors.sortItems 가 맡는다. 서버 정렬과 이중으로 두면
-  // 낙관적으로 끼워 넣은 행의 위치가 두 규칙 사이에서 흔들린다.
+  const rows: BudgetRow[] = []
+  for (const raw of data ?? []) {
+    const row = fromRollup(raw)
+    if (row) rows.push(row)
+  }
+  return rows
+}
+
+/**
+ * 결제 원장 전체를 한 번에 받는다. 항목별로 따로 조회하지 않는 이유:
+ *   - 전체가 많아야 수십 줄이다. 항목을 열 때마다 왕복하면 느리기만 하다.
+ *   - 원장을 통째로 들고 있어야 항목별 실지출을 클라이언트에서 다시 계산할 수 있고,
+ *     그래야 결제를 추가한 순간 잔금 숫자가 서버 왕복 없이 바로 움직인다.
+ */
+export const fetchPayments = async (): Promise<Payment[]> => {
+  const { data, error } = await supabase.from('payments').select('*')
+  if (error) throw toFailure(error)
   return data ?? []
 }
 
@@ -73,7 +112,7 @@ export const probeMembership = async (): Promise<boolean> => {
   return data === true
 }
 
-// ── 쓰기 ──────────────────────────────────────────────────────
+// ── 쓰기 ── 뷰가 아니라 테이블로 간다 ────────────────────────
 
 export const insertItem = async (row: ItemInsertRow): Promise<void> => {
   const { error } = await supabase.from('budget_items').insert(row)
@@ -87,6 +126,21 @@ export const updateItem = async (id: string, patch: BudgetItemUpdate): Promise<v
 
 export const deleteItem = async (id: string): Promise<void> => {
   const { error } = await supabase.from('budget_items').delete().eq('id', id)
+  if (error) throw toFailure(error)
+}
+
+export const insertPayment = async (row: PaymentInsertRow): Promise<void> => {
+  const { error } = await supabase.from('payments').insert(row)
+  if (error) throw toFailure(error)
+}
+
+export const updatePayment = async (id: string, patch: PaymentUpdate): Promise<void> => {
+  const { error } = await supabase.from('payments').update(patch).eq('id', id)
+  if (error) throw toFailure(error)
+}
+
+export const deletePayment = async (id: string): Promise<void> => {
+  const { error } = await supabase.from('payments').delete().eq('id', id)
   if (error) throw toFailure(error)
 }
 

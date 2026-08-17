@@ -75,7 +75,8 @@ export const EmptyView = ({ isMember }: EmptyViewProps) => {
         전체 그림이 빨리 잡힙니다.
       </p>
       <p className="bd-state__body bd-state__meta">
-        견적만 먼저 넣고, 결제한 뒤에 실제 지출과 결제일을 채우면 초과·절감이 자동으로 계산됩니다.
+        예산만 먼저 넣고, 업체와 금액이 확정되면 <b>계약금액</b>을 채웁니다. 돈이 나갈 때마다
+        줄을 눌러 <b>결제 추가</b> 로 한 줄씩 적으면 남은 잔금이 자동으로 계산됩니다.
       </p>
     </section>
   )

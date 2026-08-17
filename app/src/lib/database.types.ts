@@ -58,7 +58,10 @@ export type Database = {
         Row: {
           actual: number | null
           category: string | null
+          contracted: number | null
           created_at: string
+          deal_status: string | null
+          due_on: string | null
           estimate: number | null
           funding: Database["public"]["Enums"]["funding_source"]
           id: string
@@ -66,14 +69,21 @@ export type Database = {
           market_avg: number | null
           market_note: string | null
           memo: string | null
+          owner: Database["public"]["Enums"]["assignee"] | null
           paid_at: string | null
+          sort_order: number
           updated_at: string
+          vendor_contact: string | null
           vendor_id: string | null
+          vendor_name: string | null
         }
         Insert: {
           actual?: number | null
           category?: string | null
+          contracted?: number | null
           created_at?: string
+          deal_status?: string | null
+          due_on?: string | null
           estimate?: number | null
           funding?: Database["public"]["Enums"]["funding_source"]
           id?: string
@@ -81,14 +91,21 @@ export type Database = {
           market_avg?: number | null
           market_note?: string | null
           memo?: string | null
+          owner?: Database["public"]["Enums"]["assignee"] | null
           paid_at?: string | null
+          sort_order?: number
           updated_at?: string
+          vendor_contact?: string | null
           vendor_id?: string | null
+          vendor_name?: string | null
         }
         Update: {
           actual?: number | null
           category?: string | null
+          contracted?: number | null
           created_at?: string
+          deal_status?: string | null
+          due_on?: string | null
           estimate?: number | null
           funding?: Database["public"]["Enums"]["funding_source"]
           id?: string
@@ -96,9 +113,13 @@ export type Database = {
           market_avg?: number | null
           market_note?: string | null
           memo?: string | null
+          owner?: Database["public"]["Enums"]["assignee"] | null
           paid_at?: string | null
+          sort_order?: number
           updated_at?: string
+          vendor_contact?: string | null
           vendor_id?: string | null
+          vendor_name?: string | null
         }
         Relationships: [
           {
@@ -115,30 +136,39 @@ export type Database = {
           banquet_from_offset_min: number
           banquet_to_offset_min: number
           ceremony_at: string
+          expected_guests: number | null
           guarantee_count: number | null
           hall: string | null
           id: number
+          meal_unit_price: number | null
           note: string | null
+          target_budget: number | null
           updated_at: string
         }
         Insert: {
           banquet_from_offset_min?: number
           banquet_to_offset_min?: number
           ceremony_at: string
+          expected_guests?: number | null
           guarantee_count?: number | null
           hall?: string | null
           id?: number
+          meal_unit_price?: number | null
           note?: string | null
+          target_budget?: number | null
           updated_at?: string
         }
         Update: {
           banquet_from_offset_min?: number
           banquet_to_offset_min?: number
           ceremony_at?: string
+          expected_guests?: number | null
           guarantee_count?: number | null
           hall?: string | null
           id?: number
+          meal_unit_price?: number | null
           note?: string | null
+          target_budget?: number | null
           updated_at?: string
         }
         Relationships: []
@@ -274,6 +304,60 @@ export type Database = {
         }
         Relationships: []
       }
+      guests: {
+        Row: {
+          attending: Database["public"]["Enums"]["attendance"]
+          contact: string | null
+          created_at: string
+          gift_amount: number | null
+          head_count: number
+          id: string
+          invitation: Database["public"]["Enums"]["invite_state"]
+          meal_count: number
+          memo: string | null
+          name: string
+          relation: string | null
+          side: Database["public"]["Enums"]["wedding_side"]
+          sort_order: number
+          thanks: string | null
+          updated_at: string
+        }
+        Insert: {
+          attending?: Database["public"]["Enums"]["attendance"]
+          contact?: string | null
+          created_at?: string
+          gift_amount?: number | null
+          head_count?: number
+          id?: string
+          invitation?: Database["public"]["Enums"]["invite_state"]
+          meal_count?: number
+          memo?: string | null
+          name: string
+          relation?: string | null
+          side?: Database["public"]["Enums"]["wedding_side"]
+          sort_order?: number
+          thanks?: string | null
+          updated_at?: string
+        }
+        Update: {
+          attending?: Database["public"]["Enums"]["attendance"]
+          contact?: string | null
+          created_at?: string
+          gift_amount?: number | null
+          head_count?: number
+          id?: string
+          invitation?: Database["public"]["Enums"]["invite_state"]
+          meal_count?: number
+          memo?: string | null
+          name?: string
+          relation?: string | null
+          side?: Database["public"]["Enums"]["wedding_side"]
+          sort_order?: number
+          thanks?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       members: {
         Row: {
           created_at: string
@@ -292,6 +376,69 @@ export type Database = {
         }
         Relationships: []
       }
+      payments: {
+        Row: {
+          amount: number
+          budget_item_id: string | null
+          category: string | null
+          created_at: string
+          description: string | null
+          has_receipt: boolean
+          id: string
+          item_label: string | null
+          memo: string | null
+          method: string | null
+          paid_on: string
+          payer: string | null
+          updated_at: string
+        }
+        Insert: {
+          amount: number
+          budget_item_id?: string | null
+          category?: string | null
+          created_at?: string
+          description?: string | null
+          has_receipt?: boolean
+          id?: string
+          item_label?: string | null
+          memo?: string | null
+          method?: string | null
+          paid_on: string
+          payer?: string | null
+          updated_at?: string
+        }
+        Update: {
+          amount?: number
+          budget_item_id?: string | null
+          category?: string | null
+          created_at?: string
+          description?: string | null
+          has_receipt?: boolean
+          id?: string
+          item_label?: string | null
+          memo?: string | null
+          method?: string | null
+          paid_on?: string
+          payer?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "payments_budget_item_id_fkey"
+            columns: ["budget_item_id"]
+            isOneToOne: false
+            referencedRelation: "budget_items"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "payments_budget_item_id_fkey"
+            columns: ["budget_item_id"]
+            isOneToOne: false
+            referencedRelation: "budget_rollup"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       tasks: {
         Row: {
           assignee: Database["public"]["Enums"]["assignee"] | null
@@ -302,6 +449,7 @@ export type Database = {
           due_date: string | null
           id: string
           note: string | null
+          phase: string | null
           sort_order: number
           status: Database["public"]["Enums"]["task_status"]
           title: string
@@ -317,6 +465,7 @@ export type Database = {
           due_date?: string | null
           id?: string
           note?: string | null
+          phase?: string | null
           sort_order?: number
           status?: Database["public"]["Enums"]["task_status"]
           title: string
@@ -332,6 +481,7 @@ export type Database = {
           due_date?: string | null
           id?: string
           note?: string | null
+          phase?: string | null
           sort_order?: number
           status?: Database["public"]["Enums"]["task_status"]
           title?: string
@@ -383,6 +533,42 @@ export type Database = {
       }
     }
     Views: {
+      budget_rollup: {
+        Row: {
+          actual: number | null
+          category: string | null
+          contracted: number | null
+          created_at: string | null
+          deal_status: string | null
+          due_on: string | null
+          estimate: number | null
+          funding: Database["public"]["Enums"]["funding_source"] | null
+          id: string | null
+          label: string | null
+          market_avg: number | null
+          market_note: string | null
+          memo: string | null
+          owner: Database["public"]["Enums"]["assignee"] | null
+          paid_at: string | null
+          paid_sum: number | null
+          payment_count: number | null
+          sort_order: number | null
+          unpaid: number | null
+          updated_at: string | null
+          vendor_contact: string | null
+          vendor_id: string | null
+          vendor_name: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "budget_items_vendor_id_fkey"
+            columns: ["vendor_id"]
+            isOneToOne: false
+            referencedRelation: "vendors"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       day_of_schedule: {
         Row: {
           duration_min: number | null
@@ -416,8 +602,10 @@ export type Database = {
     }
     Enums: {
       assignee: "주호" | "지영" | "같이"
+      attendance: "미정" | "참석" | "불참"
       day_of_phase: "준비" | "접수" | "예식" | "촬영" | "연회" | "마무리"
       funding_source: "선지출" | "축의금"
+      invite_state: "미전달" | "전달완료" | "모바일"
       task_status: "todo" | "doing" | "done" | "hold"
       wedding_side: "신랑" | "신부" | "공통"
     }
@@ -551,8 +739,10 @@ export const Constants = {
   public: {
     Enums: {
       assignee: ["주호", "지영", "같이"],
+      attendance: ["미정", "참석", "불참"],
       day_of_phase: ["준비", "접수", "예식", "촬영", "연회", "마무리"],
       funding_source: ["선지출", "축의금"],
+      invite_state: ["미전달", "전달완료", "모바일"],
       task_status: ["todo", "doing", "done", "hold"],
       wedding_side: ["신랑", "신부", "공통"],
     },

@@ -10,18 +10,24 @@
       --ink 를 섞어 테마별로 알아서 어두워지거나 밝아지게 한다.
    4. 폼 요소 글자는 16px 이상. 그 아래면 iOS Safari 가 포커스할 때 화면을 확대하고,
       확대된 화면은 사용자가 손으로 되돌려야 한다.
-   5. 하단 네비게이션(56px + 안전영역)에 가리는 것이 없어야 한다.
+   5. 하단 네비게이션(58px + 안전영역)에 가리는 것이 없어야 한다.
       화면 하단에 고정되는 것은 실행취소 스낵바 하나뿐이고, 그것도 네비 위로 띄운다.
+   6. 가로로 넘칠 수 있는 것(칩 줄, 자금 출처 표)은 자기 상자 안에서만 스크롤한다.
+      body 로 새 나가면 화면 전체가 좌우로 흔들린다.
    ============================================================ */
 
 .bd-app {
   --bd-tap: 44px;
-  --bd-nav: calc(56px + var(--safe-bottom, 0px));
+  /* shell 의 --sh-nav-h 와 같은 값. 이 화면은 shell 변수를 import 하지 않으므로
+     여기서 따로 못 박아 둔다(둘이 어긋나면 스낵바가 네비에 가린다). */
+  --bd-nav: calc(58px + var(--safe-bottom, 0px));
   /* --good(#0ca30c) 를 그대로 글자색으로 쓰면 라이트 테마의 흰 면 위에서 4.4:1 밖에 안 나온다.
      11~12px 작은 글씨로 쓰는 자리라 --ink 를 26% 섞어 5:1 이상으로 끌어올렸다.
-     다크 테마에서는 --ink 가 흰색이라 같은 식이 반대로 밝게 만든다. */
+     다크 테마에서는 --ink 가 흰색이라 같은 식이 반대로 밝게 만든다.
+     --warn 은 노란색이라 더 심하다. 절반 가까이 섞어야 글자로 읽힌다. */
   --bd-crit-ink: color-mix(in srgb, var(--crit) 82%, var(--ink));
   --bd-good-ink: color-mix(in srgb, var(--good) 74%, var(--ink));
+  --bd-warn-ink: color-mix(in srgb, var(--warn) 52%, var(--ink));
 
   max-width: 720px;
   margin: 0 auto;
@@ -62,25 +68,6 @@
   white-space: nowrap;
 }
 
-/* ── 머리말 ───────────────────────────────────────────── */
-
-.bd-head {
-  padding: calc(20px + var(--safe-top, 0px)) 0 12px;
-}
-
-.bd-head__title {
-  font-size: 22px;
-  font-weight: 700;
-  margin: 0 0 5px;
-}
-
-.bd-head__sub {
-  margin: 0;
-  font-size: 12.5px;
-  line-height: 1.55;
-  color: var(--muted);
-}
-
 /* ── 상단 고정 집계 줄 ────────────────────────────────── */
 
 .bd-strip {
@@ -93,13 +80,20 @@
   /* .bd-app 의 좌우 여백을 넘어 화면 끝까지 선이 가도록 밖으로 밀어낸다.
      margin 만 음수로 주면 폭이 늘어난 만큼 가로 스크롤이 생기므로 padding 으로 되돌린다. */
   margin: 0 -14px;
-  padding: 9px 14px 0;
+  padding: 0 14px;
 }
 
+/* 줄 전체가 상세를 여는 버튼이다. 숫자 옆에 작은 화살표를 따로 두면 44px 을 못 지킨다. */
 .bd-strip__row {
+  width: 100%;
+  min-height: var(--bd-tap);
   display: flex;
   align-items: center;
   gap: 10px;
+  padding: 9px 0 8px;
+  background: none;
+  border: none;
+  text-align: left;
 }
 
 .bd-strip__cell {
@@ -118,15 +112,25 @@
 }
 
 .bd-v {
-  font-size: 15px;
+  font-size: 14.5px;
   font-weight: 700;
   font-variant-numeric: tabular-nums;
-  letter-spacing: -.02em;
+  letter-spacing: -.025em;
   color: var(--ink);
   /* 12자리 금액이 들어와도 줄을 밀어내지 않는다. */
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+/* 이 화면에서 제일 중요한 숫자 — 앞으로 낼 돈 */
+.bd-v--lead {
+  font-size: 15.5px;
+  font-weight: 800;
+}
+
+.bd-v--md {
+  font-size: 15.5px;
 }
 
 .bd-v--over {
@@ -135,6 +139,10 @@
 
 .bd-v--under {
   color: var(--bd-good-ink);
+}
+
+.bd-v--gift {
+  color: var(--s1);
 }
 
 /* 실시간 연결 표시 — 점 하나. 글자로 쓰면 줄이 좁아진다. */
@@ -160,10 +168,30 @@
   background: var(--crit);
 }
 
+.bd-chev {
+  flex: 0 0 auto;
+  width: 8px;
+  height: 8px;
+  border-right: 2px solid var(--muted);
+  border-bottom: 2px solid var(--muted);
+  transform: rotate(45deg) translate(-1px, -1px);
+  transition: transform .18s ease;
+}
+
+.bd-chev--open {
+  transform: rotate(-135deg) translate(-1px, -1px);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .bd-chev {
+    transition: none;
+  }
+}
+
 .bd-strip__bar {
   height: 3px;
-  margin-top: 8px;
   background: var(--grid);
+  margin: 0 -14px;
 }
 
 .bd-strip__bar i {
@@ -171,6 +199,71 @@
   height: 100%;
   background: var(--s1);
   transition: width .25s ease;
+}
+
+/* ── 결제일 알림 줄 ───────────────────────────────────── */
+
+.bd-duebar {
+  width: 100%;
+  min-height: var(--bd-tap);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 12px 0 0;
+  padding: 8px 12px;
+  text-align: left;
+  font-size: 12.5px;
+  border-radius: 12px;
+  border: 1px solid color-mix(in srgb, var(--warn) 45%, var(--hair));
+  background: color-mix(in srgb, var(--warn) 10%, transparent);
+  color: var(--ink);
+}
+
+.bd-duebar--late {
+  border-color: color-mix(in srgb, var(--crit) 45%, var(--hair));
+  background: color-mix(in srgb, var(--crit) 9%, transparent);
+}
+
+.bd-duebar[aria-pressed='true'] {
+  border-color: var(--s1);
+  box-shadow: inset 0 0 0 1px var(--s1);
+}
+
+.bd-duebar__dot {
+  flex: 0 0 auto;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--warn);
+}
+
+.bd-duebar--late .bd-duebar__dot {
+  background: var(--crit);
+}
+
+.bd-duebar__k {
+  flex: 1 1 auto;
+  min-width: 0;
+  font-weight: 600;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.bd-duebar__v {
+  flex: 0 0 auto;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.bd-duebar__d {
+  flex: 0 0 auto;
+  font-size: 11px;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  padding: 2px 7px;
+  border-radius: 999px;
+  background: color-mix(in srgb, currentcolor 12%, transparent);
 }
 
 /* ── 카드 ─────────────────────────────────────────────── */
@@ -185,25 +278,32 @@
 
 /* ── 집계 상세 ────────────────────────────────────────── */
 
-.bd-sum__head {
+/* 폰 폭에서 세 숫자를 가로로 3등분하면 한 칸이 100px 도 안 된다.
+   금액이 잘리느니 한 줄에 하나씩 두고 오른쪽 정렬로 자릿수를 맞춘다. */
+.bd-tri__cell {
   display: flex;
-  flex-direction: column;
-  gap: 2px;
+  align-items: baseline;
+  gap: 8px;
+  padding: 7px 0;
 }
 
-.bd-sum__big {
-  font-size: 30px;
-  font-weight: 700;
-  letter-spacing: -.035em;
-  font-variant-numeric: tabular-nums;
-  line-height: 1.15;
-  overflow-wrap: anywhere;
+.bd-tri__cell + .bd-tri__cell {
+  border-top: 1px solid var(--hair);
 }
 
-.bd-sum__man {
-  font-size: 13px;
-  font-weight: 600;
-  color: var(--s1);
+.bd-tri__cell .bd-k {
+  flex: 0 0 auto;
+}
+
+.bd-sum__sub {
+  flex: 1 1 auto;
+  font-size: 11px;
+  color: var(--muted);
+}
+
+.bd-tri__cell .bd-v {
+  flex: 0 0 auto;
+  margin-left: auto;
 }
 
 .bd-sum__note {
@@ -217,69 +317,73 @@
   color: var(--ink-2);
 }
 
-.bd-sum__pay {
+/* ── 자금 출처 표 ─────────────────────────────────────── */
+
+.bd-fund {
   margin-top: 15px;
   padding-top: 13px;
   border-top: 1px solid var(--hair);
+  /* 열이 넷이라 좁은 화면에서 넘칠 수 있다. 이 상자 안에서만 스크롤한다. */
+  overflow-x: auto;
+  scrollbar-width: thin;
 }
 
-.bd-payrow {
-  display: flex;
-  align-items: center;
-  gap: 7px;
-  padding: 3px 0;
-}
-
-.bd-payrow__k {
-  flex: 1 1 auto;
-  font-size: 13px;
-  color: var(--ink-2);
-}
-
-.bd-payrow__v {
-  font-size: 14.5px;
-  font-weight: 700;
+.bd-ftable {
+  width: 100%;
+  min-width: 296px;
+  border-collapse: collapse;
+  margin-top: 7px;
+  font-size: 12px;
   font-variant-numeric: tabular-nums;
 }
 
-.bd-dot {
-  width: 9px;
-  height: 9px;
-  border-radius: 50%;
-  flex: 0 0 auto;
+.bd-ftable th,
+.bd-ftable td {
+  padding: 7px 4px;
+  text-align: right;
+  white-space: nowrap;
 }
 
-.bd-dot--paid {
-  background: var(--s1);
+.bd-ftable thead th {
+  font-size: 10.5px;
+  font-weight: 600;
+  color: var(--muted);
+  border-bottom: 1px solid var(--hair);
 }
 
-.bd-dot--unpaid {
-  background: var(--grid);
-  border: 1px solid var(--axis);
+.bd-ftable thead th:first-child {
+  text-align: left;
 }
 
-.bd-bar {
-  height: 8px;
-  border-radius: 999px;
-  background: var(--surface-2);
-  border: 1px solid var(--hair);
-  overflow: hidden;
-  margin: 8px 0 0;
+.bd-ftable tbody th {
+  text-align: left;
+  font-size: 12.5px;
+  font-weight: 700;
 }
 
-.bd-bar i {
+.bd-ftable tbody th i {
   display: block;
-  height: 100%;
-  background: var(--s1);
-  transition: width .25s ease;
+  font-style: normal;
+  font-size: 10.5px;
+  font-weight: 500;
+  color: var(--muted);
 }
 
-.bd-bar--thin {
-  height: 5px;
-  margin: 4px 0 0;
-  border: none;
-  background: var(--grid);
+.bd-ftable tbody tr + tr th,
+.bd-ftable tbody tr + tr td {
+  border-top: 1px solid var(--hair);
 }
+
+.bd-ftable__lead {
+  font-weight: 800;
+}
+
+.bd-ftable__gift {
+  font-weight: 800;
+  color: var(--s1);
+}
+
+/* ── 예산 대비 ────────────────────────────────────────── */
 
 .bd-sum__diff {
   margin-top: 15px;
@@ -310,7 +414,66 @@
   background: color-mix(in srgb, currentcolor 14%, transparent);
 }
 
+/* ── 합계를 믿어도 되는지에 대한 단서 ─────────────────── */
+
+.bd-caveats {
+  list-style: none;
+  margin: 13px 0 0;
+  padding: 0;
+}
+
+.bd-caveats:empty {
+  display: none;
+}
+
+.bd-caveats li {
+  position: relative;
+  padding-left: 12px;
+  margin-top: 7px;
+  font-size: 11.5px;
+  line-height: 1.55;
+  color: var(--muted);
+}
+
+.bd-caveats li::before {
+  content: '';
+  position: absolute;
+  left: 2px;
+  top: 7px;
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: var(--axis);
+}
+
+.bd-caveats b {
+  color: var(--ink-2);
+}
+
 /* ── 카테고리별 비중 ──────────────────────────────────── */
+
+.bd-bar {
+  height: 8px;
+  border-radius: 999px;
+  background: var(--surface-2);
+  border: 1px solid var(--hair);
+  overflow: hidden;
+  margin: 8px 0 0;
+}
+
+.bd-bar i {
+  display: block;
+  height: 100%;
+  background: var(--s1);
+  transition: width .25s ease;
+}
+
+.bd-bar--thin {
+  height: 5px;
+  margin: 4px 0 0;
+  border: none;
+  background: var(--grid);
+}
 
 .bd-cats {
   margin-top: 15px;
@@ -361,8 +524,17 @@
   text-align: right;
 }
 
+.bd-cat__unpaid {
+  display: block;
+  margin-top: 3px;
+  font-size: 11px;
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+
 /* ── 추가 ─────────────────────────────────────────────── */
 
+/* 목록이 비었을 때만 쓰는 큰 버튼. 목록이 있으면 툴바의 칩(.bd-chip--add)으로 바뀐다. */
 .bd-addopen {
   width: 100%;
   min-height: var(--bd-tap);
@@ -371,7 +543,7 @@
   justify-content: center;
   gap: 8px;
   padding: 12px;
-  margin: 0 0 13px;
+  margin: 13px 0;
   font-size: 15px;
   font-weight: 700;
   color: var(--surface);
@@ -386,12 +558,31 @@
   font-weight: 400;
 }
 
+.bd-chip--add {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  color: var(--s1);
+  border-color: color-mix(in srgb, var(--s1) 35%, transparent);
+  background: color-mix(in srgb, var(--s1) 8%, transparent);
+}
+
+.bd-chip--add .bd-addopen__plus {
+  font-size: 16px;
+}
+
 .bd-compose {
   background: var(--surface);
   border: 1px solid var(--s1);
   border-radius: var(--radius);
   padding: 14px;
   margin: 0 0 13px;
+}
+
+/* 툴바 줄 안에서 열리면 한 줄을 통째로 차지한다(칩 사이에 끼면 폭이 짜부라진다). */
+.bd-toolbar__row > .bd-compose {
+  flex: 1 1 100%;
+  margin: 8px 0 0;
 }
 
 .bd-compose__head {
@@ -482,6 +673,38 @@
 .bd-input--date {
   /* iOS 는 date 입력의 내용 높이가 제각각이라 최소 높이를 못 박아 둔다. */
   min-height: var(--bd-tap);
+}
+
+.bd-check {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: var(--bd-tap);
+  margin-bottom: 12px;
+  font-size: 14px;
+}
+
+.bd-check input {
+  width: 20px;
+  height: 20px;
+  accent-color: var(--s1);
+}
+
+.bd-fill {
+  width: 100%;
+  margin-top: 7px;
+  font-variant-numeric: tabular-nums;
+}
+
+.bd-tel {
+  display: inline-flex;
+  align-items: center;
+  min-height: 36px;
+  margin-top: 4px;
+  font-size: 12.5px;
+  font-weight: 700;
+  color: var(--s1);
+  text-decoration: none;
 }
 
 .bd-grid2 {
@@ -619,7 +842,7 @@
 }
 
 .bd-toolbar {
-  margin: 0 0 10px;
+  margin: 12px 0 10px;
 }
 
 .bd-toolbar__row {
@@ -658,8 +881,16 @@
   border-color: var(--s1);
 }
 
+/* 줄 버튼과 전화 버튼은 형제다. <button> 안에 <a> 를 넣으면 유효하지 않은 마크업이고
+   폰에서 어느 쪽이 눌린 건지도 불안정하다. */
+.bd-rowwrap {
+  display: flex;
+  align-items: stretch;
+}
+
 .bd-row {
-  width: 100%;
+  flex: 1 1 auto;
+  min-width: 0;
   min-height: 62px;
   display: flex;
   align-items: flex-start;
@@ -669,6 +900,25 @@
   background: none;
   border: none;
   text-align: left;
+}
+
+.bd-row--off {
+  opacity: .55;
+}
+
+.bd-call {
+  flex: 0 0 auto;
+  width: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--s1);
+  border-left: 1px solid var(--hair);
+  text-decoration: none;
+}
+
+.bd-call:active {
+  background: color-mix(in srgb, var(--s1) 12%, transparent);
 }
 
 .bd-row__main {
@@ -690,10 +940,36 @@
 .bd-row__meta {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 5px;
   flex-wrap: wrap;
   font-size: 11.5px;
   color: var(--muted);
+}
+
+/* 진행 상태 — 목록에서 제일 먼저 읽는 값이라 왼쪽 끝에 둔다. */
+.bd-st {
+  font-size: 10.5px;
+  font-weight: 700;
+  padding: 2px 7px;
+  border-radius: 6px;
+  white-space: nowrap;
+  background: var(--surface-2);
+  color: var(--ink-2);
+}
+
+.bd-st--good {
+  background: color-mix(in srgb, var(--good) 14%, transparent);
+  color: var(--bd-good-ink);
+}
+
+.bd-st--warn {
+  background: color-mix(in srgb, var(--warn) 22%, transparent);
+  color: var(--bd-warn-ink);
+}
+
+.bd-st--off {
+  color: var(--muted);
+  text-decoration: line-through;
 }
 
 .bd-tag {
@@ -710,63 +986,6 @@
   white-space: nowrap;
 }
 
-.bd-row__vendor {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  max-width: 40vw;
-}
-
-.bd-row__paid {
-  color: var(--bd-good-ink);
-  font-weight: 600;
-}
-
-.bd-row__due {
-  color: var(--muted);
-}
-
-.bd-row__nums {
-  flex: 0 0 auto;
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  gap: 2px;
-  text-align: right;
-}
-
-.bd-amt {
-  font-size: 15.5px;
-  font-weight: 700;
-  font-variant-numeric: tabular-nums;
-  letter-spacing: -.02em;
-  white-space: nowrap;
-}
-
-.bd-amt--est {
-  color: var(--ink-2);
-  font-weight: 600;
-}
-
-.bd-amt__mark {
-  font-size: 10px;
-  font-style: normal;
-  font-weight: 700;
-  margin-left: 4px;
-  padding: 1px 5px;
-  border-radius: 4px;
-  background: var(--surface-2);
-  color: var(--muted);
-  vertical-align: 1px;
-}
-
-.bd-row__sub {
-  font-size: 11.5px;
-  color: var(--muted);
-  font-variant-numeric: tabular-nums;
-  white-space: nowrap;
-}
-
 /* 축의금으로 정산되는 항목 표시. 우리 지갑에서 나가는 돈과 색으로 갈라 둔다. */
 .bd-tag--gift {
   background: color-mix(in srgb, var(--s1) 14%, transparent);
@@ -774,44 +993,37 @@
   border-color: transparent;
   font-weight: 700;
 }
-.bd-v--gift {
-  color: var(--s1);
-}
 
-/* ── 시세 근거 (읽기 전용) ── */
-.bd-market {
-  margin: 10px 0 2px;
-  background: var(--surface-2);
-  border: 1px solid var(--hair);
-  border-radius: 10px;
+.bd-row__vendor {
   overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 40vw;
 }
 
-.bd-market__summary {
-  cursor: pointer;
-  padding: 10px 12px;
-  font-size: 12.5px;
-  font-weight: 600;
-  color: var(--ink-2);
-  /* 요약 줄도 손가락으로 눌러야 한다. 44px 을 넘기려면 padding 만으로는 모자란다. */
-  min-height: 44px;
-  display: flex;
-  align-items: center;
-  gap: 4px;
-}
-
-.bd-market__body {
-  margin: 0;
-  padding: 0 12px 12px;
-  font-size: 12.5px;
-  line-height: 1.65;
-  color: var(--ink-2);
-  /* 긴 출처 URL 이 들어 있어 그냥 두면 가로 스크롤이 생긴다. */
+/* 계약금액·낸 돈·예산 차이. 오른쪽 큰 숫자(잔금)의 근거라 작은 글씨로 아래 붙인다. */
+.bd-row__money {
+  font-size: 11.5px;
+  line-height: 1.45;
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
   overflow-wrap: anywhere;
-  white-space: pre-wrap;
 }
 
-/* 시세 줄은 업체가 부른 값이 아니라 외부 조사값이라, 위의 견적·실제와
+.bd-row__cnt {
+  font-style: normal;
+  margin-left: 3px;
+  opacity: .75;
+}
+
+/* '계약금액 미입력' — 잔금을 셀 수 없다는 표시다. 빨강으로 쓰면 이미 전액을 낸
+   항목(엑셀에 계약금액 칸이 없던 건들)까지 사고처럼 보인다. 그래서 경고색까지만. */
+.bd-warnmark {
+  color: var(--bd-warn-ink);
+  font-weight: 700;
+}
+
+/* 시세 줄은 업체가 부른 값이 아니라 외부 조사값이라, 위의 계약·예산과
    출처가 다르다는 것이 한눈에 보이도록 얇은 구분선을 둔다. */
 .bd-row__market {
   display: block;
@@ -833,6 +1045,76 @@
   color: var(--bd-good-ink);
 }
 
+.bd-row__nums {
+  flex: 0 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 2px;
+  text-align: right;
+}
+
+.bd-amt {
+  font-size: 15.5px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -.02em;
+  white-space: nowrap;
+}
+
+.bd-amt--done {
+  font-size: 14px;
+  color: var(--bd-good-ink);
+}
+
+.bd-amt--est,
+.bd-amt--plain {
+  color: var(--ink-2);
+  font-weight: 600;
+}
+
+.bd-amt--off,
+.bd-amt--muted {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--muted);
+}
+
+.bd-amt__cap {
+  font-size: 10.5px;
+  font-weight: 600;
+  color: var(--muted);
+}
+
+.bd-due {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin-top: 2px;
+  padding: 2px 6px;
+  border-radius: 6px;
+  font-size: 10.5px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+  background: var(--surface-2);
+  color: var(--muted);
+}
+
+.bd-due b {
+  font-weight: 800;
+}
+
+.bd-due--soon {
+  background: color-mix(in srgb, var(--warn) 22%, transparent);
+  color: var(--bd-warn-ink);
+}
+
+.bd-due--late {
+  background: color-mix(in srgb, var(--crit) 14%, transparent);
+  color: var(--bd-crit-ink);
+}
+
 .bd-nores {
   margin: 18px 0;
   text-align: center;
@@ -840,16 +1122,236 @@
   color: var(--muted);
 }
 
-/* ── 편집기 ───────────────────────────────────────────── */
+/* ── 펼친 영역 (원장 + 편집기) ────────────────────────── */
 
-.bd-editor {
-  padding: 4px 13px 14px;
+.bd-panel {
   border-top: 1px solid var(--hair);
   background: color-mix(in srgb, var(--surface-2) 60%, var(--surface));
 }
 
-.bd-editor > .bd-field:first-of-type {
-  margin-top: 12px;
+.bd-panel > .bd-compose {
+  margin: 0 13px 13px;
+}
+
+.bd-panel__foot {
+  display: flex;
+  gap: 8px;
+  padding: 0 13px 13px;
+}
+
+.bd-panel__foot .bd-btn {
+  flex: 1 1 0;
+}
+
+/* ── 결제 원장 ────────────────────────────────────────── */
+
+.bd-ledger {
+  padding: 12px 13px;
+}
+
+.bd-ledger__head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.bd-ledger__sum {
+  font-size: 12px;
+  color: var(--ink-2);
+  font-variant-numeric: tabular-nums;
+}
+
+.bd-ledger__sum b {
+  font-weight: 700;
+  color: var(--ink);
+}
+
+.bd-ledger__note {
+  margin: 8px 0 0;
+  font-size: 11.5px;
+  line-height: 1.55;
+  color: var(--muted);
+}
+
+.bd-ledger__note--warn {
+  color: var(--bd-crit-ink);
+}
+
+.bd-ledger__empty {
+  margin: 12px 0 0;
+  font-size: 12.5px;
+  color: var(--muted);
+}
+
+/* 남은 잔금 — 이 항목에서 앞으로 낼 돈. 원장 바로 위에 크게 둔다. */
+.bd-remain {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 4px 8px;
+  margin-top: 8px;
+  padding: 9px 11px;
+  border-radius: 10px;
+  background: var(--surface);
+  border: 1px solid var(--hair);
+  font-size: 12px;
+  color: var(--ink-2);
+}
+
+.bd-remain b {
+  margin-left: auto;
+  font-size: 16px;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  color: var(--ink);
+}
+
+.bd-remain i {
+  flex-basis: 100%;
+  font-style: normal;
+  font-size: 11px;
+  color: var(--muted);
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+.bd-remain--done b {
+  color: var(--bd-good-ink);
+}
+
+.bd-paylist {
+  list-style: none;
+  margin: 10px 0 0;
+  padding: 0;
+}
+
+.bd-pay {
+  display: flex;
+  align-items: flex-start;
+  gap: 9px;
+  min-height: var(--bd-tap);
+  padding: 9px 0;
+  border-top: 1px solid var(--hair);
+}
+
+.bd-pay__date {
+  flex: 0 0 auto;
+  width: 74px;
+  padding-top: 2px;
+  font-size: 11.5px;
+  white-space: nowrap;
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.bd-pay__body {
+  flex: 1 1 auto;
+  min-width: 0;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 3px 6px;
+}
+
+.bd-pay__desc {
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.bd-pay__meta {
+  font-size: 11px;
+  color: var(--muted);
+}
+
+.bd-pay__rcpt {
+  font-size: 10px;
+  font-weight: 700;
+  padding: 1px 5px;
+  border-radius: 5px;
+  background: color-mix(in srgb, var(--good) 14%, transparent);
+  color: var(--bd-good-ink);
+}
+
+.bd-pay__memo {
+  flex-basis: 100%;
+  font-size: 11px;
+  line-height: 1.5;
+  color: var(--muted);
+  overflow-wrap: anywhere;
+}
+
+.bd-pay__amt {
+  flex: 0 0 auto;
+  padding-top: 1px;
+  font-size: 14px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+/* 44px 타깃을 유지하되 음수 마진으로 줄 높이는 늘리지 않는다. */
+.bd-pay__del {
+  flex: 0 0 auto;
+  width: var(--bd-tap);
+  height: var(--bd-tap);
+  margin: -8px -10px -8px 0;
+  font-size: 20px;
+  line-height: 1;
+  color: var(--muted);
+  background: none;
+  border: none;
+  border-radius: 9px;
+}
+
+.bd-pay__del:active {
+  background: var(--surface-2);
+  color: var(--bd-crit-ink);
+}
+
+/* 원장이 생기기 전 budget_items.actual 로 적어 둔 값 안내 */
+.bd-carry {
+  margin-top: 10px;
+  padding: 10px 11px;
+  border-radius: 10px;
+  border: 1px dashed color-mix(in srgb, var(--warn) 55%, var(--hair));
+  background: color-mix(in srgb, var(--warn) 8%, transparent);
+}
+
+.bd-carry p {
+  margin: 0 0 8px;
+  font-size: 11.5px;
+  line-height: 1.55;
+  color: var(--ink-2);
+}
+
+.bd-addpay {
+  width: 100%;
+  min-height: var(--bd-tap);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  margin-top: 10px;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--s1);
+  background: color-mix(in srgb, var(--s1) 10%, transparent);
+  border: 1px solid color-mix(in srgb, var(--s1) 30%, transparent);
+  border-radius: 10px;
+}
+
+.bd-addpay__plus {
+  font-size: 18px;
+  line-height: 1;
+  font-weight: 400;
+}
+
+/* ── 편집기 ───────────────────────────────────────────── */
+
+.bd-editor {
+  padding: 12px 13px 14px;
+  border-top: 1px solid var(--hair);
 }
 
 .bd-vendor__new {
@@ -867,6 +1369,40 @@
   margin: 5px 0 0;
   font-size: 11.5px;
   color: var(--bd-crit-ink);
+}
+
+/* ── 시세 근거 (읽기 전용) ── */
+
+.bd-market {
+  margin: 10px 0 2px;
+  background: var(--surface-2);
+  border: 1px solid var(--hair);
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.bd-market__summary {
+  cursor: pointer;
+  padding: 10px 12px;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--ink-2);
+  /* 요약 줄도 손가락으로 눌러야 한다. 44px 을 넘기려면 padding 만으로는 모자란다. */
+  min-height: var(--bd-tap);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.bd-market__body {
+  margin: 0;
+  padding: 0 12px 12px;
+  font-size: 12.5px;
+  line-height: 1.65;
+  color: var(--ink-2);
+  /* 긴 출처 URL 이 들어 있어 그냥 두면 가로 스크롤이 생긴다. */
+  overflow-wrap: anywhere;
+  white-space: pre-wrap;
 }
 
 /* ── 버튼 ─────────────────────────────────────────────── */
@@ -1042,6 +1578,5 @@
 @media (prefers-reduced-motion: reduce) {
   .bd-skel__row {
     animation: none;
-    background: var(--surface-2);
   }
 }

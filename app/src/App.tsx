@@ -15,9 +15,10 @@ import type { TabKey } from './shell'
  */
 const ChecklistTab = lazy(() => import('./screens/ChecklistTab'))
 const BudgetTab = lazy(() => import('./budget/BudgetApp'))
+const GuestsTab = lazy(() => import('./guests/GuestsApp'))
 const DayOfTab = lazy(() => import('./dayof/DayOfApp'))
 
-const TAB_KEYS: readonly TabKey[] = ['home', 'checklist', 'budget', 'dayof']
+const TAB_KEYS: readonly TabKey[] = ['home', 'checklist', 'budget', 'guests', 'dayof']
 
 const readTab = (): TabKey => {
   const raw = window.location.hash.replace(/^#\/?/, '')
@@ -73,6 +74,7 @@ const Shell = () => {
         {tab === 'home' && <HomeScreen onNavigate={navigate} />}
         {tab === 'checklist' && <ChecklistTab displayName={who} />}
         {tab === 'budget' && <BudgetTab />}
+        {tab === 'guests' && <GuestsTab />}
         {tab === 'dayof' && <DayOfTab />}
       </Suspense>
     </AppShell>

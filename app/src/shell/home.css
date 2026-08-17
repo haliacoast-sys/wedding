@@ -18,16 +18,24 @@
    ============================================================ */
 
 .hm {
-  padding-top: 16px;
+  padding-top: 12px;
+  /* body 는 1.68 이다. 글을 읽는 줄간격이라 문단에는 맞지만 대시보드에는 너무 성기다.
+     실측: 13.5px 짜리 두 줄 항목 하나가 54px 를 먹었다(3건이면 카드 하나 분량).
+     여기서 1.45 로 좁히면 같은 내용이 카드 두 개 분량 덜 차지한다. 숫자·라벨은
+     한두 단어짜리라 줄바꿈이 거의 없고, 줄간격이 읽기 편의를 좌우하지 않는다. */
+  line-height: 1.45;
 }
 
+/* 패딩 16 → 14, 카드 간격 13 → 10.
+   하객 카드가 들어오면서 카드가 넷에서 다섯으로 늘었다. 카드마다 9px 씩,
+   합쳐서 45px 를 여기서 되찾는다. 첫 화면에서 카드 하나가 통째로 더 들어오는 양이다. */
 .hm-card,
 .hm-hero {
   background: var(--surface);
   border: 1px solid var(--hair);
   border-radius: var(--radius);
-  padding: 16px;
-  margin: 0 0 13px;
+  padding: 13px 14px;
+  margin: 0 0 10px;
 }
 
 /* 스크린리더 전용 텍스트 */
@@ -66,7 +74,7 @@
 /* 두 줄짜리 압축판. 매일 보는 화면에서 바뀌는 값은 D-day 하나뿐이라
    숫자를 줄이고 나머지를 한 줄에 붙였다. 세로 공간이 절반 이하로 준다. */
 .hm-hero--slim {
-  padding: 14px 16px 13px;
+  padding: 12px 14px 11px;
 }
 .hm-hero--slim .hm-hero__n {
   font-size: 34px;
@@ -83,8 +91,8 @@
   display: flex;
   align-items: center;
   gap: 10px;
-  margin-top: 12px;
-  padding-top: 11px;
+  margin-top: 9px;
+  padding-top: 8px;
   border-top: 1px solid var(--hair);
 }
 .hm-progline .hm-bar {
@@ -144,7 +152,7 @@
   font-size: 14px;
   font-weight: 700;
   color: var(--ink-2);
-  margin: 0 0 10px;
+  margin: 0 0 8px;
 }
 
 .hm-chev {
@@ -186,7 +194,7 @@
   display: flex;
   align-items: baseline;
   gap: 4px;
-  margin: 0 0 10px;
+  margin: 0 0 8px;
   font-size: 14px;
 }
 
@@ -285,7 +293,7 @@
 /* ── 임박 · 지연 목록 ─────────────────────────────────────── */
 
 .hm-sec {
-  margin-top: 12px;
+  margin-top: 10px;
 }
 
 .hm-sec:first-child {
@@ -324,13 +332,80 @@
   align-items: center;
   gap: 10px;
   margin: 0;
-  padding: 7px 0;
+  padding: 6px 0;
   font-size: 14px;
   border-top: 1px solid var(--hair);
 }
 
-.hm-item:first-child {
+.hm-item:first-child,
+.hm-pay:first-child {
   border-top: 0;
+}
+
+/* ── 결제 예정 (한 줄) ────────────────────────────────────────
+   할 일 행(.hm-item)은 제목과 메타를 두 줄로 쌓지만 결제는 한 줄이다.
+   "언제 · 무엇 · 얼마" 셋뿐이라 한 줄에 들어가고, 예산 카드에 목록이 하나 더
+   생기면서 하객 카드가 화면 밖으로 밀리는 것을 막아야 했다.
+   가운데 항목명만 늘었다 줄었다 하고(min-width:0 + ellipsis) 날짜·금액은 고정폭이라
+   320px 에서도 금액이 잘리지 않는다. */
+
+.hm-pay {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  margin: 0;
+  padding: 4px 0;
+  font-size: 12.5px;
+  border-top: 1px solid var(--hair);
+}
+
+.hm-pay__when {
+  flex: 0 0 auto;
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+/* 결제 예정일이 이미 지난 건. 지연된 할 일과 같은 색 규칙을 쓴다. */
+.hm-pay__when--over {
+  color: color-mix(in srgb, var(--crit) 82%, var(--ink));
+  font-weight: 700;
+}
+
+.hm-pay__what {
+  flex: 1 1 auto;
+  min-width: 0;
+  color: var(--ink);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* 축의금으로 정산할 건이라는 꼬리표. 금액 색(파랑)만으로는 뜻이 전달되지 않는다. */
+.hm-pay__tag {
+  margin-left: 5px;
+  padding: 1px 5px;
+  border-radius: 999px;
+  background: var(--s1-wash);
+  color: var(--s1);
+  font-size: 10px;
+  font-style: normal;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.hm-pay__amt {
+  flex: 0 0 auto;
+  font-weight: 700;
+  color: var(--ink);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+/* `.hm-pay__amt`(0,1,0) 와 특정도가 같아 뒤에 온 쪽이 이긴다.
+   .hm-gift 는 이 파일 위쪽(0,1,0)에 있으므로 여기서 한 번 더 못 박아 둔다. */
+.hm-pay .hm-gift {
+  color: var(--s1);
 }
 
 .hm-item__text {
@@ -381,9 +456,20 @@
 
 .hm-more,
 .hm-foot {
-  margin: 6px 0 0;
+  margin: 4px 0 0;
   font-size: 11.5px;
   color: var(--muted);
+}
+
+/* 초과/미달을 글자색으로 표시한다. 상태색을 그대로 쓰면 라이트 테마에서 읽히지 않아
+   --ink 를 섞는다. .hm-kv 안에서는 `.hm-kv dd`(0,1,1) 를 이겨야 해서 아래에 한 벌 더 있다. */
+.hm-over {
+  color: color-mix(in srgb, var(--crit) 82%, var(--ink));
+  font-weight: 700;
+}
+
+.hm-under {
+  color: color-mix(in srgb, var(--good) 84%, var(--ink));
 }
 
 /* ── 예산 ────────────────────────────────────────────────── */
@@ -391,9 +477,17 @@
 .hm-kv {
   display: grid;
   grid-template-columns: auto 1fr;
-  gap: 7px 12px;
+  gap: 6px 12px;
   margin: 0;
   font-size: 13px;
+}
+
+/* 결제 예정 목록 바로 밑에 붙을 때는 줄을 하나 그어 분리한다.
+   선이 없으면 '축의금 정산 잔금'이 결제 예정 목록의 마지막 행처럼 읽힌다. */
+.hm-sec + .hm-kv {
+  margin-top: 9px;
+  padding-top: 9px;
+  border-top: 1px solid var(--hair);
 }
 
 .hm-kv dt {
@@ -415,6 +509,13 @@
 
 .hm-kv .hm-under {
   color: color-mix(in srgb, var(--good) 84%, var(--ink));
+}
+
+/* 같은 이유로 .hm-gift(0,1,0) 도 여기서 다시 못 박는다.
+   이게 없으면 `.hm-kv dd` 가 이겨서 '축의금 정산 잔금' 금액이 검은색으로 나온다
+   — 결제 예정 행의 축의금 금액(파랑)과 색이 어긋나 같은 주머니로 읽히지 않는다. */
+.hm-kv .hm-gift {
+  color: var(--s1);
 }
 
 /* ── 보조 문구 ───────────────────────────────────────────── */

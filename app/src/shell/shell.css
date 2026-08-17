@@ -155,7 +155,8 @@ body:has(.sh-shell) {
 
 .sh-tab {
   flex: 1 1 auto;
-  /* 터치 타겟: 높이 58px, 폭은 4분할이라 360px 화면에서도 90px. 둘 다 44px 이상. */
+  /* 터치 타겟: 높이 58px, 폭은 5분할이라 320px 화면에서도 64px. 둘 다 44px 이상.
+     (실측 320px: 셀 64px / 안쪽 60px, 가장 긴 라벨 '체크리스트'가 51px → 9px 여유.) */
   min-height: var(--sh-nav-h);
   min-width: 44px;
   display: flex;
@@ -185,8 +186,30 @@ body:has(.sh-shell) {
   transition: background .15s;
 }
 
+/* nowrap 이 중요하다. 라벨이 두 줄로 접히면 탭 높이가 늘고 --sh-nav-h(58px)를 기준으로
+   잡아둔 --sh-nav-total 이 실제와 어긋나 하단 콘텐츠가 네비에 가린다.
+   폭이 모자라면 접지 말고 말줄임으로 흘려보낸다 — 높이는 어떤 경우에도 고정이다. */
 .sh-tab__label {
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+/* 320px 급 좁은 화면. 탭이 넷에서 다섯으로 늘면서 셀이 80px → 64px 이 됐다.
+   기본값으로도 '체크리스트'가 9px 여유를 두고 들어가지만, 사용자가 시스템 글자 크기를
+   키우거나 한글 폰트가 조금 넓은 기기에서는 그 9px 이 바로 사라진다.
+   글자만 0.5px 줄이고 자간을 조금 더 좁혀 여유를 9px → 약 16px 로 늘린다.
+   터치 타겟(64×58)과 아이콘 크기는 그대로다. */
+@media (max-width: 359px) {
+  .sh-tab {
+    font-size: 10px;
+    letter-spacing: -.045em;
+  }
+
+  .sh-tab__icon {
+    width: 40px;
+  }
 }
 
 /* 활성 탭: 색(muted → s1) · 굵기(600 → 800) · 아이콘 뒤 워시 · 선 굵기(1.6 → 2.0).

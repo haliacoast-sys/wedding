@@ -1,12 +1,17 @@
 /**
- * AddComposer.tsx — 목록 맨 위에서 바로 항목을 추가한다.
+ * AddComposer.tsx — 목록 자리에서 바로 항목을 추가한다.
  *
- * 페이지를 옮기지 않는다. 항목 추가는 이 화면에서 제일 자주 하는 일이고,
- * 한 번 옮겼다 돌아오면 방금 넣은 항목이 목록 어디에 들어갔는지 다시 찾아야 한다.
+ * 페이지를 옮기지 않는다. 한 번 옮겼다 돌아오면 방금 넣은 항목이 목록 어디에
+ * 들어갔는지 다시 찾아야 한다.
+ *
+ * 여는 버튼은 두 모양이다.
+ *   block — 목록이 비었을 때. 이때는 이게 화면에서 할 수 있는 유일한 일이라 크게 둔다.
+ *   chip  — 목록이 있을 때. 툴바 끝에 칩 하나로 붙는다. 항목 추가는 이제 가끔 하는
+ *           일이고(대부분의 항목은 이미 있다), 화면 위쪽은 실제 목록이 차지해야 한다.
  *
  * 추가 후에도 입력창을 닫지 않고 카테고리만 남긴다. 예산은 보통 같은 카테고리를
  * 연달아 적기 때문이다(스드메 3~4줄을 한 번에 적는 식).
- * 항목명과 견적만 받는다. 실제 지출·결제일·업체·메모는 줄을 탭해서 채운다.
+ * 나머지(업체·예정일·상태·결제)는 줄을 탭해서 채운다.
  */
 import { useRef, useState } from 'react'
 import { MoneyInput } from './MoneyInput'
@@ -19,9 +24,14 @@ export type AddComposerProps = {
   categories: string[]
   /** 필터로 카테고리를 좁혀 둔 상태라면 그 카테고리를 기본값으로 쓴다. */
   defaultCategory?: string | null
+  variant?: 'chip' | 'block'
 }
 
-export const AddComposer = ({ categories, defaultCategory }: AddComposerProps) => {
+export const AddComposer = ({
+  categories,
+  defaultCategory,
+  variant = 'chip',
+}: AddComposerProps) => {
   const [open, setOpen] = useState(false)
   const [draft, setDraft] = useState<ItemDraft>(() => emptyDraft(defaultCategory ?? ''))
   const [justAdded, setJustAdded] = useState<string | null>(null)
@@ -49,7 +59,11 @@ export const AddComposer = ({ categories, defaultCategory }: AddComposerProps) =
 
   if (!open) {
     return (
-      <button type="button" className="bd-addopen" onClick={openComposer}>
+      <button
+        type="button"
+        className={variant === 'block' ? 'bd-addopen' : 'bd-chip bd-chip--add'}
+        onClick={openComposer}
+      >
         <span className="bd-addopen__plus" aria-hidden="true">
           +
         </span>
@@ -100,13 +114,23 @@ export const AddComposer = ({ categories, defaultCategory }: AddComposerProps) =
         />
       </label>
 
-      <div className="bd-field">
-        <span className="bd-field__label">견적</span>
-        <MoneyInput
-          aria-label="견적 금액"
-          value={draft.estimate}
-          onChange={(won) => setDraft((d) => ({ ...d, estimate: won }))}
-        />
+      <div className="bd-grid2">
+        <div className="bd-field">
+          <span className="bd-field__label">예산</span>
+          <MoneyInput
+            aria-label="예산 금액"
+            value={draft.estimate}
+            onChange={(won) => setDraft((d) => ({ ...d, estimate: won }))}
+          />
+        </div>
+        <div className="bd-field">
+          <span className="bd-field__label">계약금액</span>
+          <MoneyInput
+            aria-label="계약금액"
+            value={draft.contracted}
+            onChange={(won) => setDraft((d) => ({ ...d, contracted: won }))}
+          />
+        </div>
       </div>
 
       <div className="bd-field">
@@ -118,9 +142,7 @@ export const AddComposer = ({ categories, defaultCategory }: AddComposerProps) =
               type="button"
               className="bd-chip bd-chip--sm"
               aria-pressed={draft.category === c}
-              onClick={() =>
-                setDraft((d) => ({ ...d, category: d.category === c ? '' : c }))
-              }
+              onClick={() => setDraft((d) => ({ ...d, category: d.category === c ? '' : c }))}
             >
               {c}
             </button>
